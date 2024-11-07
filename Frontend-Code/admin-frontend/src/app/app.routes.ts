@@ -1,8 +1,11 @@
+// app.routes.ts
 import { Routes } from '@angular/router';
+import { LayoutComponent } from './shared/layout/layout.component';
 import { LandingPageComponent } from './pages/landing-page/landing-page.component';
 import { LoginPageComponent } from './pages/login-page/login-page.component';
 import { DashboardPageComponent } from './pages/dashboard-page/dashboard-page.component';
 import { UserManagementPageComponent } from './pages/user-management-page/user-management-page.component';
+
 export const routes: Routes = [
   {
     path: '',
@@ -13,12 +16,18 @@ export const routes: Routes = [
     component: LoginPageComponent
   },
   {
-    path: 'dashboard',
-    component: DashboardPageComponent
-  },
-  {
-    path: 'users',
-    component: UserManagementPageComponent
+    path: '',
+    component: LayoutComponent,
+    children: [
+      {
+        path: 'dashboard',
+        component: DashboardPageComponent
+      },
+      {
+        path: 'users',
+        component: UserManagementPageComponent
+      }
+    ]
   },
   {
     path: '**',
