@@ -2,61 +2,65 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatBadgeModule } from '@angular/material/badge';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    MatIconModule,
+    MatButtonModule,
+    MatMenuModule,
+    MatBadgeModule
+  ],
   template: `
-    <header class="bg-white shadow-sm border-b">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-          <div class="flex items-center">
-            <button
-              (click)="toggleSidebar.emit()"
-              class="p-2 rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 focus:outline-none"
-            >
-              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-              </svg>
-            </button>
-          </div>
+    <header class="bg-white shadow-sm border-b h-16">
+      <div class="h-full px-4 flex items-center justify-between">
+        <div class="flex items-center">
+          <button mat-icon-button (click)="toggleSidebar.emit()" class="lg:hidden">
+            <mat-icon>menu</mat-icon>
+          </button>
+          <h1 class="text-xl font-semibold ml-2">Dashboard</h1>
+        </div>
 
-          <div class="flex items-center">
-            <div class="flex items-center space-x-4">
-              <!-- Notifications -->
-              <div class="relative">
-                <button
-                  (click)="toggleNotifications()"
-                  class="p-2 rounded-full text-gray-500 hover:text-gray-900 hover:bg-gray-100 focus:outline-none"
-                >
-                  <span class="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
-                  <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                  </svg>
-                </button>
-
-                <div *ngIf="showNotifications" class="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-1">
-                  <!-- Notifications dropdown content -->
-                </div>
-              </div>
-
-              <!-- Profile dropdown -->
-              <div class="relative">
-                <button
-                  (click)="toggleProfile()"
-                  class="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100"
-                >
-                  <img class="h-8 w-8 rounded-full object-cover" src="assets/avatar.jpg" alt="User avatar">
-                  <span class="hidden md:block font-medium text-gray-700">John Doe</span>
-                </button>
-
-                <div *ngIf="showProfile" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
-                  <!-- Profile dropdown content -->
-                </div>
-              </div>
+        <div class="flex items-center space-x-2">
+          <!-- Notifications -->
+          <button mat-icon-button [matMenuTriggerFor]="notificationMenu">
+            <mat-icon [matBadge]="'3'" matBadgeColor="warn" matBadgeSize="small">
+              notifications
+            </mat-icon>
+          </button>
+          <mat-menu #notificationMenu="matMenu" class="w-80">
+            <!-- Add notification items here -->
+            <div class="p-4">
+              <div class="text-sm">Your notifications here</div>
             </div>
-          </div>
+          </mat-menu>
+
+          <!-- Profile -->
+          <button mat-button [matMenuTriggerFor]="profileMenu" class="flex items-center">
+            <img class="h-8 w-8 rounded-full object-cover" src="assets/avatar.jpg" alt="User avatar">
+            <mat-icon class="ml-1">arrow_drop_down</mat-icon>
+          </button>
+          <mat-menu #profileMenu="matMenu">
+            <button mat-menu-item>
+              <mat-icon>person</mat-icon>
+              <span>Profile</span>
+            </button>
+            <button mat-menu-item>
+              <mat-icon>settings</mat-icon>
+              <span>Settings</span>
+            </button>
+            <button mat-menu-item>
+              <mat-icon>logout</mat-icon>
+              <span>Logout</span>
+            </button>
+          </mat-menu>
         </div>
       </div>
     </header>
@@ -64,16 +68,4 @@ import { RouterModule } from '@angular/router';
 })
 export class HeaderComponent {
   @Output() toggleSidebar = new EventEmitter<void>();
-  showNotifications = false;
-  showProfile = false;
-
-  toggleNotifications(): void {
-    this.showNotifications = !this.showNotifications;
-    this.showProfile = false;
-  }
-
-  toggleProfile(): void {
-    this.showProfile = !this.showProfile;
-    this.showNotifications = false;
-  }
 }
