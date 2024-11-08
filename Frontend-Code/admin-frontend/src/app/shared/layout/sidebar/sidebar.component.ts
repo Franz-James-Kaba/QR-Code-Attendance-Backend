@@ -32,7 +32,7 @@ interface NavItem {
                alt="Logo">
         </div>
 
-        <nav class="flex-1 overflow-y-auto py-4">
+        <nav class="flex-1 py-4">
           <div class="px-2 space-y-1">
             <ng-container *ngFor="let item of navItems">
               <a [routerLink]="item.path"
@@ -45,10 +45,10 @@ interface NavItem {
                       class="ml-3 transition-all duration-300">
                   {{item.label}}
                 </span>
-                <span *ngIf="item.badge"
+                <!-- <span *ngIf="item.badge"
                       class="absolute right-2 inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-red-500">
                   {{item.badge}}
-                </span>
+                </span> -->
               </a>
             </ng-container>
           </div>
