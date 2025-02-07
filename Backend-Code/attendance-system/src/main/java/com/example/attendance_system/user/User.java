@@ -35,6 +35,7 @@ public class User implements UserDetails, Principal {
 
     @Column(nullable = false,unique = true)
     private String email;
+    private boolean passwordResetRequired = true;
     @Size(min = 8)
     private String password;
     @CreatedDate
@@ -44,8 +45,6 @@ public class User implements UserDetails, Principal {
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
 
-
-//    private boolean resetPassword = true;
 
     @Override
     public String getName() {

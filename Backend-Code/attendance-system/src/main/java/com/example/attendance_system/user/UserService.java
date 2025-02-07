@@ -16,11 +16,13 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final PasswordGenerator passwordGenerator;
     private final EmailService emailService;
+    private final TokenRepository tokenRepository;
+
 
 
     public void createUser(RegisterRequest request) {
         String password = passwordGenerator.generatePassword(12);
-//        String encryptedPassword = passwordEncoder.encode(password);
+
 
         var userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new IllegalStateException("Role does not exist"));
@@ -34,8 +36,19 @@ public class UserService {
                 .build();
          userRepository.save(user);
          emailService.sendEmail(user.getEmail(),"Password Reset", "Use this email and this password: "
-                 +password+" to login and please reset the password");
+                 + password + " to login and please reset the password");
 
+
+    }
+
+    public String resetPassword(String email, ResetPasswordRequest request) {
+        var user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalStateException("User does not exist"));
+
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        userRepository.save(user);
+        return "Password reset successful";
+    }
 
     }
 }
