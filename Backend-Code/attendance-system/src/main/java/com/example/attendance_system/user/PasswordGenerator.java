@@ -13,6 +13,5 @@ public class PasswordGenerator {
         byte[] bytes = new byte[length];
         random.nextBytes(bytes);
         return Base64.getEncoder().encodeToString(bytes).substring(0, length);
-
     }
 }
