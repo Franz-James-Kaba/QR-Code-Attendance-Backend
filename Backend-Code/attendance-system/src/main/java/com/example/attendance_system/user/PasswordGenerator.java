@@ -8,7 +8,9 @@ import java.util.Base64;
 
 @Service
 public class PasswordGenerator {
-    public String generatePassword(int length) {
+
+  public String generatePassword(int length) {
+
         SecureRandom random = new SecureRandom();
         byte[] bytes = new byte[length];
         random.nextBytes(bytes);

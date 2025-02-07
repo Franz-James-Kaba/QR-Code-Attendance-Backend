@@ -46,7 +46,6 @@ public class User implements UserDetails, Principal {
     private List<Role> roles;
 
 
-
     @Override
     public String getName() {
         return email;

@@ -2,13 +2,10 @@ package com.example.attendance_system.user;
 
 import com.example.attendance_system.email.EmailService;
 import com.example.attendance_system.role.RoleRepository;
-import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.security.SecureRandom;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -22,8 +19,10 @@ public class UserService {
     private final TokenRepository tokenRepository;
 
 
+
     public void createUser(RegisterRequest request) {
         String password = passwordGenerator.generatePassword(12);
+
 
         var userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new IllegalStateException("Role does not exist"));
@@ -51,4 +50,5 @@ public class UserService {
         return "Password reset successful";
     }
 
+    }
 }
