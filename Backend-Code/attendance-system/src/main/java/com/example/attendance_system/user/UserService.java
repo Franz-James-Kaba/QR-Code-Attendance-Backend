@@ -1,6 +1,7 @@
 package com.example.attendance_system.user;
 
 import com.example.attendance_system.email.EmailService;
+import com.example.attendance_system.response.AuthenticationResponse;
 import com.example.attendance_system.role.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,8 +17,6 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final PasswordGenerator passwordGenerator;
     private final EmailService emailService;
-    private final TokenRepository tokenRepository;
-
 
 
     public void createUser(RegisterRequest request) {
@@ -50,5 +49,8 @@ public class UserService {
         return "Password reset successful";
     }
 
+    public AuthenticationResponse login(AuthenticationRequest request) {
+        return null;
     }
+
 }

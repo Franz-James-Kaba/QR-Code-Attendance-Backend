@@ -1,5 +1,6 @@
 package com.example.attendance_system.user;
 
+import com.example.attendance_system.response.AuthenticationResponse;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,11 @@ public class UserController {
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) throws MessagingException {
         userService.createUser(request);
         return ResponseEntity.ok("User registered successfully");
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest request) {
+        return ResponseEntity.ok(userService.login(request));
     }
 
     @PutMapping("/reset-password")

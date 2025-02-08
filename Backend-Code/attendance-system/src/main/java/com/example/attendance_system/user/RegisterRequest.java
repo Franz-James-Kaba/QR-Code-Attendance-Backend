@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.aspectj.bridge.Message;
 
 @Setter
 @Getter

@@ -32,11 +32,5 @@ public class Role {
     @Column(updatable = false)
     private LocalDateTime createdDate;
 
-//    @PrePersist
-//    protected void onCreate() {
-//        if (this.createdDate == null) {
-//            this.createdDate = LocalDateTime.now();
-//        }
-//    }
 
 }
