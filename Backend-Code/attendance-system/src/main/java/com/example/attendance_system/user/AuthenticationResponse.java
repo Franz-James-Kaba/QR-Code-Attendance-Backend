@@ -1,10 +1,11 @@
-package com.example.attendance_system.response;
+package com.example.attendance_system.user;
 
+import com.example.attendance_system.role.Role;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.management.relation.Role;
+import java.util.List;
 
 @Getter
 @Setter
@@ -12,6 +13,5 @@ import javax.management.relation.Role;
 public class AuthenticationResponse {
     private String token;
     private boolean passwordResetRequired;
-    private Role role;
-
+    private List<Role> roles;
 }

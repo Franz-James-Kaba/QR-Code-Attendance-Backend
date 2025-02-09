@@ -23,8 +23,23 @@ public class UserController {
         return ResponseEntity.ok("User registered successfully");
     }
 
-    @PutMapping("/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestParam String email, @RequestBody ResetPasswordRequest request) {
-        return ResponseEntity.ok(userService.resetPassword(email, request));
+    @PostMapping("/login")
+    public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest request) {
+        return ResponseEntity.ok(userService.login(request));
+    }
+
+    @PostMapping("/reset-password-request")
+    public ResponseEntity<String> resetPassword(@RequestParam String email) {
+        return ResponseEntity.ok(userService.resetPasswordRequest(email));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestParam String email, @RequestParam String token, @RequestBody ResetPasswordRequest request) {
+        return ResponseEntity.ok(userService.resetPassword(token, email, request));
+    }
+
+    @PostMapping("/first-password-reset")
+    public ResponseEntity<String> firstPasswordReset(@RequestParam String email, @RequestBody ResetPasswordRequest request) {
+        return ResponseEntity.ok(userService.firstPasswordReset(email, request));
     }
 }
