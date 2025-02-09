@@ -1,6 +1,5 @@
 package com.example.attendance_system.user;
 
-import com.example.attendance_system.response.AuthenticationResponse;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +28,18 @@ public class UserController {
         return ResponseEntity.ok(userService.login(request));
     }
 
-    @PutMapping("/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestParam String email, @RequestBody ResetPasswordRequest request) {
-        return ResponseEntity.ok(userService.resetPassword(email, request));
+    @PostMapping("/reset-password-request")
+    public ResponseEntity<String> resetPassword(@RequestParam String email) {
+        return ResponseEntity.ok(userService.resetPasswordRequest(email));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestParam String email, @RequestParam String token, @RequestBody ResetPasswordRequest request) {
+        return ResponseEntity.ok(userService.resetPassword(token, email, request));
+    }
+
+    @PostMapping("/first-password-reset")
+    public ResponseEntity<String> firstPasswordReset(@RequestParam String email, @RequestBody ResetPasswordRequest request) {
+        return ResponseEntity.ok(userService.firstPasswordReset(email, request));
     }
 }

@@ -45,6 +45,8 @@ public class User implements UserDetails, Principal {
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
 
+    private boolean enabled;
+
 
     @Override
     public String getName() {
@@ -86,6 +88,6 @@ public class User implements UserDetails, Principal {
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return enabled;
     }
 }
