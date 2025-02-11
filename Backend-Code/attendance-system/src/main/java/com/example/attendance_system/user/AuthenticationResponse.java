@@ -13,5 +13,5 @@ import java.util.List;
 public class AuthenticationResponse {
     private String token;
     private boolean passwordResetRequired;
-    private List<Role> roles;
+    private String role;
 }

@@ -1,36 +1,37 @@
 package com.example.attendance_system.role;
 
 
-import com.example.attendance_system.user.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-@Entity
-@Getter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@Setter
-@Table(name = "role")
-public class Role {
-    @Id
-    @GeneratedValue
-    private Integer id;
-    @Column(unique=true)
-    private String name;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-    @ManyToMany(mappedBy = "roles")
-    @JsonIgnore
-    private List<User> users;
+import static com.example.attendance_system.role.Permission.*;
 
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdDate;
+@RequiredArgsConstructor
+public enum Role {
+    USER(Set.of(
+            USER_UPDATE
+    )),
+    ADMIN(
+            Set.of(
+                    ADMIN_UPDATE,
+                    ADMIN_READ
+            )
+    );
 
+    @Getter
+    private final Set<Permission> permissions;
+
+    public List<SimpleGrantedAuthority> getAuthorities() {
+        var authorities = permissions.stream()
+                .map(permission -> new SimpleGrantedAuthority(permission.getPermission()))
+                .collect(Collectors.toList());
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + name()));
+        return authorities;
+    }
 
 }
