@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@CrossOrigin
 @RequestMapping("api/auth")
 @RequiredArgsConstructor
 public class UserController {
@@ -29,7 +30,7 @@ public class UserController {
     }
 
     @PostMapping("/reset-password-request")
-    public ResponseEntity<String> resetPassword(@RequestParam String email) {
+    public ResponseEntity<String> resetPassword(@RequestParam String email) throws MessagingException {
         return ResponseEntity.ok(userService.resetPasswordRequest(email));
     }
 

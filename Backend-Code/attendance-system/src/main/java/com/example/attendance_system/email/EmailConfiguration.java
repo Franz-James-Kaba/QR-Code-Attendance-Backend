@@ -1,6 +1,7 @@
 package com.example.attendance_system.email;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import lombok.Getter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -12,7 +13,8 @@ import java.util.Properties;
 public class EmailConfiguration {
     Dotenv dotenv = Dotenv.load();
     String password = dotenv.get("APP_PASSWORD");
-    String username = dotenv.get("APP_USERNAME");
+    @Getter
+    private final String username = dotenv.get("APP_USERNAME");
 
     @Bean
     public JavaMailSender javaMailSender() {

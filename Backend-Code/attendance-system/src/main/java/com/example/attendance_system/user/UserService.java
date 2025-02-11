@@ -2,35 +2,34 @@ package com.example.attendance_system.user;
 
 import com.example.attendance_system.config.JWTService;
 import com.example.attendance_system.email.EmailService;
-import com.example.attendance_system.role.RoleRepository;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.List;
+
+import static com.example.attendance_system.role.Role.USER;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final RoleRepository roleRepository;
     private final PasswordGenerator passwordGenerator;
     private final EmailService emailService;
     private final AuthenticationManager authenticationManager;
     private final JWTService jwtService;
     private final TokenRepository tokenRepository;
+    private final TokenService tokenService;
 
 
     public void createUser(RegisterRequest request) {
         String password = passwordGenerator.generatePassword(12);
 
-        var userRole = roleRepository.findByName("USER")
-                .orElseThrow(() -> new IllegalStateException("Role does not exist"));
+
         var user = User.builder()
                 .firstName(request.getFirstName())
                 .middleName(request.getMiddleName())
@@ -38,7 +37,7 @@ public class UserService {
                 .passwordResetRequired(true)
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(password))
-                .roles(List.of(userRole))
+                .role(USER)
                 .enabled(false)
                 .build();
          userRepository.save(user);
@@ -65,7 +64,7 @@ public class UserService {
         return AuthenticationResponse.builder()
                 .token(token)
                 .passwordResetRequired(user.isPasswordResetRequired())
-                .roles(user.getRoles())
+                .role(user.getRole().name())
                 .build();
     }
 
@@ -87,41 +86,11 @@ public class UserService {
         return "Password reset successful";
     }
 
-    public String resetPasswordRequest(String email) {
+    public String resetPasswordRequest(String email) throws MessagingException {
         var user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalStateException("User not found"));
         sendPasswordResetMail(user);
         return "Password reset code sent to your email address";
-    }
-
-    private void sendPasswordResetMail(User user) {
-        String token = generateAndSaveToken(user);
-        emailService.sendEmail(user.getEmail(),
-                "Password Reset",
-                "You requested to reset your password. Enter the following code to reset your password. " + token);
-    }
-
-    private String generateAndSaveToken(User user) {
-        String generatedToken = generateCode();
-        var token = Token.builder()
-                .token(generatedToken)
-                .user(user)
-                .createdAt(LocalDateTime.now())
-                .expiresAt(LocalDateTime.now().plusMinutes(15))
-                .build();
-        tokenRepository.save(token);
-        return generatedToken;
-    }
-
-    private String generateCode() {
-        String characters = "0123456789";
-        StringBuilder token = new StringBuilder();
-        SecureRandom random = new SecureRandom();
-        for (int i = 0; i < 6; i++) {
-            var randomIndex = random.nextInt(characters.length());
-            token.append(characters.charAt(randomIndex));
-        }
-        return token.toString();
     }
 
     public String firstPasswordReset(String email, ResetPasswordRequest request) {
@@ -133,5 +102,23 @@ public class UserService {
         user.setEnabled(true);
         userRepository.save(user);
         return "Password reset successful";
+    }
+
+    private void sendPasswordResetMail(User user) throws MessagingException {
+        String token = tokenService.generateAndSaveToken(user);
+        emailService.sendPasswordResetEmail(
+                user.getEmail(),
+                user.getFirstName(),
+                token
+        );
+    }
+
+    public User updateUser(Long userId, UpdateUserRequest request) {
+        var user = userRepository.findById(userId).orElseThrow(() -> new IllegalStateException("User not found"));
+        user.setFirstName(request.getFirstName());
+        user.setMiddleName(request.getMiddleName());
+        user.setLastName(request.getLastName());
+        user.setEmail(request.getEmail());
+        return userRepository.save(user);
     }
 }
