@@ -1,9 +1,9 @@
 <div class="form-field">
   @if (label) {
-    <label [for]="name" class="block text-sm font-medium text-gray-700">
+    <label [for]="name" class="block text-sm font-medium text-gray-700 mb-2">
       {{ label }}
        @if (required) {
-        <span class="text-red-500">*</span>
+        <span class="text-black">*</span>
        }
     </label>
   }
@@ -19,10 +19,11 @@
       [disabled]="disabled"
       (input)="onInputChange($event)"
       (blur)="markAsTouched()"
-      class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+      class="block w-full rounded-sm border-gray-700 border focus:border-gray-900 focus:ring-gray-600 disabled:bg-gray-100 disabled:cursor-not-allowed p-2.5"
       [class.border-red-500]="errorMessage"
       [attr.aria-invalid]="!!errorMessage"
       [attr.aria-describedby]="errorMessage ? name + '-error' : null"
+      autocomplete="on"
     >
 
     @if (isPassword && showPasswordToggle) {

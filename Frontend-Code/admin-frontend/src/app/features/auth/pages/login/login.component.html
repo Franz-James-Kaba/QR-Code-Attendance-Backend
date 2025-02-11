@@ -1,1 +1,36 @@
-<p>login works!</p>
+<section class="w-full max-w-lg mx-auto px-4">
+  <!-- Title -->
+  <div class="mb-4">
+    <h1 class="text-3xl text-gray-900 text-center">Sign in to continue...</h1>
+  </div>
+
+  <!-- Form Container -->
+  <div class="bg-white rounded shadow-sm py-6 px-16">
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      <!-- Email Field -->
+      <div>
+        <app-input-field type="email" label="Work email" name="email" placeholder="Enter work email" [required]="true"
+          formControlName="email" class="block" />
+      </div>
+
+      <div>
+        <!-- Password Field -->
+        <app-input-field type="password" label="Password" name="password" placeholder="Enter password" [required]="true"
+          [showPasswordToggle]="true" formControlName="password" class="block" />
+      </div>
+
+      <div>
+        <!-- Sign In Button -->
+        <app-button type="submit" [disabled]="loginForm.invalid" [fullWidth]="true" class="mt-6">
+          Sign in
+        </app-button>
+      </div>
+
+      <!-- Reset Password Link -->
+      <div class="text-center text-sm mt-4">
+        <span class="text-gray-600">Forgot password? </span>
+        <a href="#" class="text-gray-900 hover:underline">Reset</a>
+      </div>
+    </form>
+  </div>
+</section>
