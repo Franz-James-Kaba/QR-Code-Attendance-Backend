@@ -1,10 +1,11 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LoadingComponent } from '../loading/loading.component';
 
 @Component({
   selector: 'app-button',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LoadingComponent],
   templateUrl: './button.component.html',
   styleUrl: './button.component.css'
 })
@@ -29,6 +30,15 @@ export class ButtonComponent {
       ${this.getVariantClasses()}
       ${this.fullWidth ? 'w-full' : ''}
     `.trim();
+  }
+
+  get loadingSize(): 'sm' | 'md' | 'lg' {
+    const sizes = {
+      sm: 'sm',
+      md: 'sm',
+      lg: 'md'
+    } as const;
+    return sizes[this.size];
   }
 
   private getSizeClasses(): string {
