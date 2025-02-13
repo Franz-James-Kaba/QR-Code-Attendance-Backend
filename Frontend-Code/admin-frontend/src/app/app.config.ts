@@ -3,7 +3,6 @@ import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
-import { loadingInterceptor } from './core/interceptors/loading.interceptor';
 import { provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
@@ -21,7 +20,6 @@ export const appConfig: ApplicationConfig = {
     provideStoreDevtools(),
     provideHttpClient(
       withInterceptors([
-        loadingInterceptor,
         authInterceptor
       ])
     ),

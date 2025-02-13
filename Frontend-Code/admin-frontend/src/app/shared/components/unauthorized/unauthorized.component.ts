@@ -6,6 +6,6 @@ import { ButtonComponent } from '../button/button.component';
   selector: 'app-unauthorized',
   standalone: true,
   imports: [RouterModule, ButtonComponent],
-  template: './unauthorized.component.html',
+  templateUrl: './unauthorized.component.html',
 })
 export class UnauthorizedComponent {}

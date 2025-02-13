@@ -6,6 +6,6 @@ import { ButtonComponent } from '../button/button.component';
   selector: 'app-not-found',
   standalone: true,
   imports: [RouterModule, ButtonComponent],
-  template: './not-found.component.html',
+  templateUrl: './not-found.component.html',
 })
 export class NotFoundComponent {}

@@ -18,15 +18,15 @@ export const routes: Routes = [
         path: 'login',
         loadComponent: () => import('./features/auth/pages/login/login.component')
           .then(m => m.LoginComponent),
-        canActivate: [() => {
-          const router = inject(Router);
-          const token = localStorage.getItem('auth_token');
-          if (token) {
-            router.navigate(['/admin/dashboard']);
-            return false;
-          }
-          return true;
-        }]
+        // canActivate: [() => {
+        //   const router = inject(Router);
+        //   const token = localStorage.getItem('auth_token');
+        //   if (token) {
+        //     router.navigate(['/admin/dashboard']);
+        //     return false;
+        //   }
+        //   return true;
+        // }]
       },
       {
         path: 'reset-password',

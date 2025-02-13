@@ -4,12 +4,4 @@
   <div class="content">
     <router-outlet></router-outlet>
   </div>
-
-  <!-- Loading Overlay -->
-  @if (loading$ | async) {
-    <app-loading
-      variant="fullscreen"
-      text="Loading..."
-    />
-  }
 </div>
