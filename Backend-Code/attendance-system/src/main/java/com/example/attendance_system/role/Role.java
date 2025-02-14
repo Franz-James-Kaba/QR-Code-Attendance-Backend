@@ -19,7 +19,8 @@ public enum Role {
     ADMIN(
             Set.of(
                     ADMIN_UPDATE,
-                    ADMIN_READ
+                    ADMIN_READ,
+                    ADMIN_DELETE
             )
     );
 

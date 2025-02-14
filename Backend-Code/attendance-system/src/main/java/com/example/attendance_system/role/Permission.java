@@ -8,6 +8,7 @@ public enum Permission {
 
     ADMIN_UPDATE("admin:update"),
     ADMIN_READ("admin:read"),
+    ADMIN_DELETE("admin:delete"),
     USER_UPDATE("user:update");
 
     @Getter
