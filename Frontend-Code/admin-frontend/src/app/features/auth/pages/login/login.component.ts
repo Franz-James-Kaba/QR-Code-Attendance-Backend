@@ -3,10 +3,9 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { InputFieldComponent } from '../../../../shared/components/input-field/input-field.component';
-import { ButtonComponent } from '../../../../shared/components/button/button.component';
-import { login } from '../../../../core/store/states/auth/auth.actions';
-import { selectAuthError, selectIsLoading } from '../../../../core/store/states/auth/auth.selectors';
+import { InputFieldComponent } from '@shared/components/input-field/input-field.component';
+import { ButtonComponent } from '@shared/components/button/button.component';
+import { login } from '@store/states/auth/auth.actions';
 
 @Component({
   selector: 'app-login',
@@ -40,6 +39,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     ).subscribe((error: any) => {
       if (error) {
         // Handle error (e.g., show toast notification)
+
       }
     });
   }
@@ -56,3 +56,11 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
   }
 }
+function selectIsLoading(state: object): unknown {
+  throw new Error('Function not implemented.');
+}
+
+function selectAuthError(state: object): unknown {
+  throw new Error('Function not implemented.');
+}
+
