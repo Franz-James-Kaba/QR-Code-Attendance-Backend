@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     private final UserService userService;
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) throws MessagingException {
-        userService.createUser(request);
-        return ResponseEntity.ok("User registered successfully");
+    @PostMapping("/create-admin")
+    public ResponseEntity<String> createAdmin(@RequestBody @Valid RegisterRequest request) throws MessagingException {
+        return ResponseEntity.ok(userService.createAdmin(request));
+
     }
 
     @PostMapping("/login")

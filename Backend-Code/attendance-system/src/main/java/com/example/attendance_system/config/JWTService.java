@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,8 @@ import java.util.function.Function;
 @Service
 public class JWTService {
     private String secretKey = "";
+    @Value("${application.security.jwt.expiration}")
+    private long jwtExpiration;
 
     public JWTService() {
         KeyGenerator keyGenerator = null;
@@ -39,7 +42,7 @@ public class JWTService {
                 .add(claims)
                 .subject(username)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + (3_600_000)))
+                .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .and()
                 .signWith(getKey())
                 .compact();
