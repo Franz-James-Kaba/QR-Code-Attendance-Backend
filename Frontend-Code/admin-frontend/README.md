@@ -49,7 +49,7 @@ Make sure you have the following installed before running the project:
 
 1️⃣ **Clone the repository:**
 ```bash
-git clone <repository-url>
+git clone [<repository-url>](https://github.com/Franz-James-Kaba/QR-Code-Attendance/tree/main/Frontend-Code/admin-frontend)
 cd admin-frontend
 ```
 
@@ -60,7 +60,7 @@ npm install
 
 3️⃣ **Start the development server:**
 ```bash
-npm start
+ng serve --open
 ```
 
 4️⃣ **Open in browser:** 🌐
