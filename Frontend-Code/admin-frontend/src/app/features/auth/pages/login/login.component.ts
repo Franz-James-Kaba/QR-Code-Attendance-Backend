@@ -12,7 +12,8 @@ import { login } from '@store/states/auth/auth.actions';
   standalone: true,
   imports: [InputFieldComponent, ReactiveFormsModule, ButtonComponent],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrl: './login.component.css',
+  onChangeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginComponent implements OnInit, OnDestroy {
   loginForm: FormGroup;
