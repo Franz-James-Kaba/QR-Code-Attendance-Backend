@@ -1,0 +1,49 @@
+<header class="fixed top-0 right-0 left-0 z-30 h-16 bg-white border-b transition-all duration-300"
+  [class.md:left-64]="sidebarOpen && !sidebarMinimized"
+  [class.md:left-16]="sidebarOpen && sidebarMinimized">
+  <div class="flex items-center justify-between h-full px-4">
+    <!-- Mobile menu button -->
+    @if (showMobileMenu) {
+      <button
+        class="p-2 rounded-lg hover:bg-gray-100 md:hidden"
+        (click)="onToggleSidebar()"
+        aria-label="Toggle menu">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    }
+
+    <!-- Search Bar -->
+    @if (showSearch) {
+      <div class="hidden md:flex md:flex-1 md:max-w-md">
+        <div class="relative w-full">
+          <input
+            type="search"
+            class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
+            placeholder="Search..."
+            aria-label="Search">
+          <div class="absolute inset-y-0 left-0 flex items-center pl-3">
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- User Menu -->
+    @if (showUserMenu) {
+      <div class="flex items-center">
+        <button class="flex items-center p-2 rounded-lg hover:bg-gray-100">
+          <img
+            [src]="userAvatar"
+            [alt]="userName"
+            class="w-8 h-8 rounded-full">
+          <span class="ml-2 text-sm font-medium text-gray-700">{{ userName }}</span>
+        </button>
+      </div>
+    }
+  </div>
+</header>
