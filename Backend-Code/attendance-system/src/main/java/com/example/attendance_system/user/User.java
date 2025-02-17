@@ -42,8 +42,6 @@ public class User implements UserDetails, Principal {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    private boolean enabled;
-
 
     @Override
     public String getName() {

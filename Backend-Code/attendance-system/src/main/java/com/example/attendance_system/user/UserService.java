@@ -7,12 +7,12 @@ import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+import static com.example.attendance_system.role.Role.ADMIN;
 import static com.example.attendance_system.role.Role.USER;
 
 @Service
@@ -28,9 +28,8 @@ public class UserService {
     private final TokenService tokenService;
 
 
-    public void createUser(RegisterRequest request) {
+    public void createUser(RegisterRequest request) throws MessagingException {
         String password = passwordGenerator.generatePassword(12);
-
 
         var user = User.builder()
                 .firstName(request.getFirstName())
@@ -40,13 +39,34 @@ public class UserService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(password))
                 .role(USER)
-                .enabled(false)
                 .build();
          userRepository.save(user);
-         emailService.sendEmail(user.getEmail(),"Password Reset", "Use this email and this password: "
-                 + password + " to login and please reset the password");
+         emailService.sendMailWithTemporaryPassword(
+                 user.getEmail(),
+                 user.getFirstName(),
+                 password
+         );
 
+    }
 
+    public String createAdmin(RegisterRequest request) throws MessagingException {
+        var password = passwordGenerator.generatePassword(12);
+        var user = User.builder()
+                .firstName(request.getFirstName())
+                .middleName(request.getMiddleName())
+                .lastName(request.getLastName())
+                .passwordResetRequired(true)
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(password))
+                .role(ADMIN)
+                .build();
+        userRepository.save(user);
+        emailService.sendMailWithTemporaryPassword(
+                user.getEmail(),
+                user.getFirstName(),
+                password
+        );
+        return "Admin created successfully";
     }
 
     public AuthenticationResponse login(AuthenticationRequest request) {
@@ -101,7 +121,6 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setPasswordResetRequired(false);
-        user.setEnabled(true);
         userRepository.save(user);
         return "Password reset successful";
     }
@@ -128,4 +147,5 @@ public class UserService {
         var user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
         userRepository.delete(user);
     }
+
 }

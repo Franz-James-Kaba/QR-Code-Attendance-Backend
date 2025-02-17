@@ -18,6 +18,7 @@ public enum Role {
     )),
     ADMIN(
             Set.of(
+                    ADMIN_CREATE,
                     ADMIN_UPDATE,
                     ADMIN_READ,
                     ADMIN_DELETE
