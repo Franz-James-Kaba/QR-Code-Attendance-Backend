@@ -17,7 +17,7 @@ public class RegisterRequest {
     private String firstName;
     private String middleName;
     @NotBlank(message = "lastName is required")
-    @Size(min = 3, max = 50, message = "First name must be at least 3 characters long")
+    @Size(min = 3, max = 50, message = "Last name must be at least 3 characters long")
     private String lastName;
     @Email(message = "Invalid email format")
     @NotEmpty(message = "Email should not be empty")
