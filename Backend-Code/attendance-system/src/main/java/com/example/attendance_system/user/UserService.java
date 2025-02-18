@@ -2,10 +2,7 @@ package com.example.attendance_system.user;
 
 import com.example.attendance_system.config.JWTService;
 import com.example.attendance_system.email.EmailService;
-import com.example.attendance_system.exceptions.InvalidTokenException;
-import com.example.attendance_system.exceptions.ResourceNotFoundException;
-import com.example.attendance_system.exceptions.TokenExpiredException;
-import com.example.attendance_system.exceptions.UserNotFoundException;
+import com.example.attendance_system.exceptions.*;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -100,11 +97,7 @@ public class UserService {
         var savedToken = tokenRepository.findByToken(token)
                 .orElseThrow(() -> new ResourceNotFoundException("Token does not exist"));
 
-        if (!email.equals(savedToken.getUser().getEmail()))
-            throw new InvalidTokenException("Invalid token");
-
-        if (savedToken.getExpiresAt().isBefore(LocalDateTime.now()))
-            throw new TokenExpiredException("Token is expired.");
+        validateRequest(email, request, savedToken);
 
         var user = userRepository.findByEmail(savedToken.getUser().getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -152,6 +145,14 @@ public class UserService {
     public void deleteUser(Long userId) {
         var user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
         userRepository.delete(user);
+    }
+
+    private void validateRequest(String email, ResetPasswordRequest request, Token savedToken) {
+        if (!email.equals(savedToken.getUser().getEmail()))
+            throw new InvalidTokenException("Invalid token");
+
+        if (savedToken.getExpiresAt().isBefore(LocalDateTime.now()))
+            throw new TokenExpiredException("Token is expired.");
     }
 
 }
