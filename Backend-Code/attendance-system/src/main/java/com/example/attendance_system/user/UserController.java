@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -24,7 +26,12 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/create-admin")
-    public ResponseEntity<String> createAdmin(@RequestBody @Valid RegisterRequest request) throws MessagingException {
+    public ResponseEntity<String> createAdmin(@RequestBody @Valid RegisterRequest request, BindingResult bindingResult) throws MessagingException {
+        if(bindingResult.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(erorr -> errors.put(erorr.getField(), erorr.getDefaultMessage()));
+            return ResponseEntity.badRequest().body(errors.toString());
+        }
         return ResponseEntity.ok(userService.createAdmin(request));
 
     }
