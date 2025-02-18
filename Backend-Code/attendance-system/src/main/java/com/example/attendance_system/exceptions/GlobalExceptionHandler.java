@@ -57,4 +57,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, UNAUTHORIZED);
     }
 
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleException(MethodArgumentNotValidException exception) {
+        var error = ErrorResponse.builder()
+                .message(exception.getMessage())
+                .code(BAD_REQUEST.value())
+                .build();
+        return new ResponseEntity<>(error, BAD_REQUEST);
+    }
+
 }
