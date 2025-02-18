@@ -12,15 +12,16 @@ import lombok.Setter;
 @Getter
 @Builder
 public class RegisterRequest {
-    @NotBlank(message="firstName can not be blank")
+    @NotBlank(message="firstName is required")
     @Size(min = 3, max = 50, message = "First name must be at least 3 characters long")
     private String firstName;
     private String middleName;
-    @NotBlank(message = "lastName should not be blank")
+    @NotBlank(message = "lastName is required")
+    @Size(min = 3, max = 50, message = "First name must be at least 3 characters long")
     private String lastName;
     @Email(message = "Invalid email format")
     @NotEmpty(message = "Email should not be empty")
-    @NotBlank(message = "Email should not be blank")
+    @NotBlank(message = "Email is required")
     private String email;
 
 }
