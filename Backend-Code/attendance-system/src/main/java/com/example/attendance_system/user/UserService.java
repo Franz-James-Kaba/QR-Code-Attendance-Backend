@@ -30,6 +30,7 @@ public class UserService {
     private final TokenService tokenService;
 
 
+
     public void createUser(RegisterRequest request) throws MessagingException {
         String password = passwordGenerator.generatePassword(12);
 
@@ -144,6 +145,7 @@ public class UserService {
 
     public void deleteUser(Long userId) {
         var user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+
         userRepository.delete(user);
     }
 
