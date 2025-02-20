@@ -13,7 +13,6 @@ import { login } from '@store/states/auth/auth.actions';
   imports: [InputFieldComponent, ReactiveFormsModule, ButtonComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
-  onChangeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginComponent implements OnInit, OnDestroy {
   loginForm: FormGroup;
