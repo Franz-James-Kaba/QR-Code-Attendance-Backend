@@ -2,13 +2,17 @@ package com.example.attendance_system.user;
 
 import com.example.attendance_system.config.JWTService;
 import com.example.attendance_system.email.EmailService;
-import com.example.attendance_system.exceptions.UserNotFoundException;
+import com.example.attendance_system.exceptions.*;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 
@@ -26,6 +30,7 @@ public class UserService {
     private final JWTService jwtService;
     private final TokenRepository tokenRepository;
     private final TokenService tokenService;
+
 
 
     public void createUser(RegisterRequest request) throws MessagingException {
@@ -70,38 +75,35 @@ public class UserService {
     }
 
     public AuthenticationResponse login(AuthenticationRequest request) {
-        var authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+        try {
+            var authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
 
-        if (!authentication.isAuthenticated()) {
-            throw new IllegalStateException("Authentication failed");
+            var user = (User) authentication.getPrincipal();
+            var token = jwtService.generateToken(user.getUsername());
+            return AuthenticationResponse.builder()
+                    .token(token)
+                    .passwordResetRequired(user.isPasswordResetRequired())
+                    .role(user.getRole().name())
+                    .build();
+
+        } catch (AuthenticationException ex) {
+            throw new BadCredentialsException("Invalid username or password");
         }
-
-        var user = (User) authentication.getPrincipal();
-        var token = jwtService.generateToken(user.getUsername());
-        return AuthenticationResponse.builder()
-                .token(token)
-                .passwordResetRequired(user.isPasswordResetRequired())
-                .role(user.getRole().name())
-                .build();
     }
 
     public String resetPassword(String token, String email, ResetPasswordRequest request) {
         var savedToken = tokenRepository.findByToken(token)
-                .orElseThrow(() -> new IllegalStateException("Token does not exist"));
+                .orElseThrow(() -> new ResourceNotFoundException("Token does not exist"));
 
-        if (!email.equals(savedToken.getUser().getEmail()))
-            throw new IllegalStateException("Invalid token");
-
-        if (savedToken.getExpiresAt().isBefore(LocalDateTime.now()))
-            throw new IllegalStateException("Token is expired.");
+        validateRequest(email, request, savedToken);
 
         var user = userRepository.findByEmail(savedToken.getUser().getEmail())
-                .orElseThrow(() -> new IllegalStateException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
         tokenRepository.delete(savedToken);
@@ -110,14 +112,14 @@ public class UserService {
 
     public String resetPasswordRequest(String email) throws MessagingException {
         var user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalStateException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         sendPasswordResetMail(user);
         return "Password reset code sent to your email address";
     }
 
     public String firstPasswordReset(String email, ResetPasswordRequest request) {
         var user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalStateException("User does not exist"));
+                .orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
 
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setPasswordResetRequired(false);
@@ -135,7 +137,7 @@ public class UserService {
     }
 
     public User updateUser(Long userId, UpdateUserRequest request) {
-        var user = userRepository.findById(userId).orElseThrow(() -> new IllegalStateException("User not found"));
+        var user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         user.setFirstName(request.getFirstName());
         user.setMiddleName(request.getMiddleName());
         user.setLastName(request.getLastName());
@@ -145,7 +147,16 @@ public class UserService {
 
     public void deleteUser(Long userId) {
         var user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+
         userRepository.delete(user);
+    }
+
+    private void validateRequest(String email, ResetPasswordRequest request, Token savedToken) {
+        if (!email.equals(savedToken.getUser().getEmail()))
+            throw new InvalidTokenException("Invalid token");
+
+        if (savedToken.getExpiresAt().isBefore(LocalDateTime.now()))
+            throw new TokenExpiredException("Token is expired.");
     }
 
 }
