@@ -28,3 +28,8 @@ export const selectIsLoading = createSelector(
   selectAuthState,
   (state) => state.isLoading
 );
+
+export const selectSuccessMessage = createSelector(
+  selectAuthState,
+  (state) => state.successMessage
+);

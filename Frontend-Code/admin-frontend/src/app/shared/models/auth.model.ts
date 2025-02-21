@@ -21,6 +21,7 @@ export interface AuthState {
   passwordResetRequired: boolean;
   isLoading: boolean;
   error: string | null;
+  successMessage: string | null;
 }
 
 export const initialAuthState: AuthState = {
@@ -28,5 +29,6 @@ export const initialAuthState: AuthState = {
   token: null,
   passwordResetRequired: false,
   isLoading: false,
-  error: null
+  error: null,
+  successMessage: null,
 };

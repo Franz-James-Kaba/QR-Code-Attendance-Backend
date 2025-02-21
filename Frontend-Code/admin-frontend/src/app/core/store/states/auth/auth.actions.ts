@@ -9,5 +9,8 @@ export const AuthActions = {
   resetPassword: createAction('[Auth] Reset Password', props<{ oldPassword: string; newPassword: string }>()),
   resetPasswordSuccess: createAction('[Auth] Reset Password Success'),
   resetPasswordFailure: createAction('[Auth] Reset Password Failure', props<{ error: string }>()),
-  clearError: createAction('[Auth] Clear Error')
+  clearError: createAction('[Auth] Clear Error'),
+  forgotPassword: createAction('[Auth] Forgot Password', props<{ email: string }>()),
+  forgotPasswordSuccess: createAction('[Auth] Forgot Password Success'),
+  forgotPasswordFailure: createAction('[Auth] Forgot Password Failure', props<{ error: string }>())
 };

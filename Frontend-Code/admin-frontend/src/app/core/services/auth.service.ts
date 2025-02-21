@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, delay } from 'rxjs';
+import { Observable, of, delay, catchError, throwError } from 'rxjs';
 import { AuthResponse, LoginCredentials, User } from '../../shared/models/auth.model';
 
 @Injectable({
@@ -32,9 +32,13 @@ export class AuthService {
     });
   }
 
-  forgotPassword(email: string): Observable<void> {
-    console.log('Forgot password email:', email);
-    return of(undefined).pipe(delay(1000));
+    forgotPassword(email: string): Observable<void> {
+    return this.http.post<void>(`${this.API_URL}/forgot-password`, { email }).pipe(
+      catchError(error => {
+        const errorMessage = error.error?.message || 'Failed to send reset link';
+        return throwError(() => new Error(errorMessage));
+      })
+    );
   }
 
   logout(): void {

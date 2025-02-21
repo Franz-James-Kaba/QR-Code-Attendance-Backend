@@ -54,6 +54,32 @@ export class AuthEffects {
     )
   );
 
+  forgotPassword$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.forgotPassword),
+      exhaustMap(({ email }) =>
+        this.authService.forgotPassword(email).pipe(
+          map(() => AuthActions.forgotPasswordSuccess()),
+          catchError(error => of(AuthActions.forgotPasswordFailure({
+            error: error.message || 'An error occurred during password reset'
+          })))
+        )
+      )
+    )
+  );
+
+  forgotPasswordSuccess$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.forgotPasswordSuccess),
+        tap(() => {
+          // Show success message or navigate to confirmation page
+          this.router.navigate(['/auth/forgot-password-confirmation']);
+        })
+      ),
+    { dispatch: false }
+  );
+
   logout$ = createEffect(
     () =>
       this.actions$.pipe(

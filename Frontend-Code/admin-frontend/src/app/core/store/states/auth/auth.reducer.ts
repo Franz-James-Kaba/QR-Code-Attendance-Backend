@@ -8,6 +8,7 @@ const initialState: AuthState = {
   passwordResetRequired: false,
   isLoading: false,
   error: null,
+  successMessage: null,
 };
 
 export const authReducer = createReducer(
@@ -50,5 +51,23 @@ export const authReducer = createReducer(
   on(AuthActions.clearError, (state) => ({
     ...state,
     error: null,
+  })),
+
+  on(AuthActions.forgotPassword, (state) => ({
+    ...state,
+    isLoading: true,
+    error: null
+  })),
+
+  on(AuthActions.forgotPasswordSuccess, (state) => ({
+    ...state,
+    isLoading: false,
+    error: null
+  })),
+
+  on(AuthActions.forgotPasswordFailure, (state, { error }) => ({
+    ...state,
+    isLoading: false,
+    error
   }))
 );
