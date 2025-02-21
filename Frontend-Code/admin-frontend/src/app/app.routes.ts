@@ -34,6 +34,11 @@ export const routes: Routes = [
           .then(m => m.ResetPasswordComponent)
       },
       {
+        path: 'forgot-password',
+        loadComponent: () => import('./features/auth/pages/forgot-password/forgot-password.component')
+          .then(m => m.ForgotPasswordComponent)
+      },
+      {
         path: 'unauthorized',
         loadComponent: () => import('./shared/components/unauthorized/unauthorized.component')
           .then(m => m.UnauthorizedComponent)

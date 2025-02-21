@@ -1,24 +1,30 @@
+// auth.selectors.ts
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { AuthState } from './auth.reducer';
+import { AuthState } from '@shared/models/auth.model';
 
 export const selectAuthState = createFeatureSelector<AuthState>('auth');
 
+export const selectUser = createSelector(
+  selectAuthState,
+  (state) => state.user
+);
+
 export const selectIsAuthenticated = createSelector(
   selectAuthState,
-  auth => !!auth.token
+  (state) => !!state.token
 );
 
 export const selectPasswordResetRequired = createSelector(
   selectAuthState,
-  auth => auth.passwordResetRequired
+  (state) => state.passwordResetRequired
 );
 
 export const selectAuthError = createSelector(
   selectAuthState,
-  auth => auth.error
+  (state) => state.error
 );
 
 export const selectIsLoading = createSelector(
   selectAuthState,
-  auth => auth.isLoading
+  (state) => state.isLoading
 );

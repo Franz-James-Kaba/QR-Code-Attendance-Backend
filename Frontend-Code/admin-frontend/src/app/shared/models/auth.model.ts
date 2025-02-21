@@ -1,10 +1,32 @@
+export interface User {
+  id: string;
+  email: string;
+  role: string;
+}
+
 export interface AuthResponse {
+  user: User;
   token: string;
   passwordResetRequired: boolean;
-  role: string;
 }
 
 export interface LoginCredentials {
   email: string;
   password: string;
 }
+
+export interface AuthState {
+  user: User | null;
+  token: string | null;
+  passwordResetRequired: boolean;
+  isLoading: boolean;
+  error: string | null;
+}
+
+export const initialAuthState: AuthState = {
+  user: null,
+  token: null,
+  passwordResetRequired: false,
+  isLoading: false,
+  error: null
+};

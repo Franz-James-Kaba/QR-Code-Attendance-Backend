@@ -1,44 +1,54 @@
 import { createReducer, on } from '@ngrx/store';
-import * as AuthActions from './auth.actions';
+import { AuthState } from '@shared/models/auth.model';
+import { AuthActions } from './auth.actions';
 
-export interface AuthState {
-  token: string | null;
-  passwordResetRequired: boolean;
-  role: string | null;
-  isLoading: boolean;
-  error: string | null;
-}
-
-export const initialState: AuthState = {
+const initialState: AuthState = {
+  user: null,
   token: null,
   passwordResetRequired: false,
-  role: null,
   isLoading: false,
-  error: null
+  error: null,
 };
 
 export const authReducer = createReducer(
   initialState,
-  on(AuthActions.login, state => ({
+
+  on(AuthActions.login, (state) => ({
     ...state,
     isLoading: true,
-    error: null
+    error: null,
   })),
+
   on(AuthActions.loginSuccess, (state, { response }) => ({
     ...state,
+    user: response.user,
     token: response.token,
     passwordResetRequired: response.passwordResetRequired,
-    role: response.role,
-    isLoading: false
+    isLoading: false,
+    error: null,
   })),
+
   on(AuthActions.loginFailure, (state, { error }) => ({
     ...state,
+    isLoading: false,
     error,
-    isLoading: false
   })),
+
   on(AuthActions.logout, () => initialState),
-  on(AuthActions.resetPasswordSuccess, state => ({
+
+  on(AuthActions.resetPasswordSuccess, (state) => ({
     ...state,
-    passwordResetRequired: false
+    passwordResetRequired: false,
+    error: null,
+  })),
+
+  on(AuthActions.resetPasswordFailure, (state, { error }) => ({
+    ...state,
+    error,
+  })),
+
+  on(AuthActions.clearError, (state) => ({
+    ...state,
+    error: null,
   }))
 );
