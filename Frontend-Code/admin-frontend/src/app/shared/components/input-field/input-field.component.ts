@@ -24,7 +24,7 @@ export class InputFieldComponent implements ControlValueAccessor, OnInit {
   hasError = false;
   touched = false;
 
-  constructor(@Self() @Optional() private ngControl: NgControl) {
+  constructor(@Self() @Optional() private readonly ngControl: NgControl) {
     if (this.ngControl) {
       this.ngControl.valueAccessor = this;
     }

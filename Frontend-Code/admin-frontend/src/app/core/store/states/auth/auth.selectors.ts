@@ -33,3 +33,18 @@ export const selectSuccessMessage = createSelector(
   selectAuthState,
   (state) => state.successMessage
 );
+
+export const selectAuthStep = createSelector(
+  selectAuthState,
+  (state) => state.currentStep
+);
+
+export const selectEmail = createSelector(
+  selectAuthState,
+  (state) => state.email
+);
+
+export const selectOtpVerified = createSelector(
+  selectAuthState,
+  (state) => state.otpVerified
+);

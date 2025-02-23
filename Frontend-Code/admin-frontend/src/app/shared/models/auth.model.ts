@@ -1,3 +1,9 @@
+export enum AuthStep {
+  EMAIL = 'EMAIL',
+  OTP = 'OTP',
+  RESET_PASSWORD = 'RESET_PASSWORD',
+}
+
 export interface User {
   id: string;
   email: string;
@@ -22,6 +28,9 @@ export interface AuthState {
   isLoading: boolean;
   error: string | null;
   successMessage: string | null;
+  currentStep: AuthStep;
+  email: string | null;
+  otpVerified: boolean;
 }
 
 export const initialAuthState: AuthState = {
@@ -31,4 +40,7 @@ export const initialAuthState: AuthState = {
   isLoading: false,
   error: null,
   successMessage: null,
+  currentStep: AuthStep.EMAIL,
+  email: null,
+  otpVerified: false,
 };

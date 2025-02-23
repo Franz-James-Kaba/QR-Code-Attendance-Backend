@@ -1,5 +1,5 @@
 import { createReducer, on } from '@ngrx/store';
-import { AuthState } from '@shared/models/auth.model';
+import { AuthState, AuthStep } from '@shared/models/auth.model';
 import { AuthActions } from './auth.actions';
 
 const initialState: AuthState = {
@@ -9,6 +9,9 @@ const initialState: AuthState = {
   isLoading: false,
   error: null,
   successMessage: null,
+  currentStep: AuthStep.EMAIL,
+  email: null,
+  otpVerified: false,
 };
 
 export const authReducer = createReducer(
@@ -56,18 +59,34 @@ export const authReducer = createReducer(
   on(AuthActions.forgotPassword, (state) => ({
     ...state,
     isLoading: true,
-    error: null
+    error: null,
   })),
 
   on(AuthActions.forgotPasswordSuccess, (state) => ({
     ...state,
     isLoading: false,
-    error: null
+    error: null,
   })),
 
   on(AuthActions.forgotPasswordFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    error
+    error,
+  })),
+
+  on(AuthActions.setAuthStep, (state, { step }) => ({
+    ...state,
+    currentStep: step,
+  })),
+
+  on(AuthActions.verifyOtpSuccess, (state) => ({
+    ...state,
+    otpVerified: true,
+    error: null,
+  })),
+
+  on(AuthActions.verifyOtpFailure, (state, { error }) => ({
+    ...state,
+    error,
   }))
 );

@@ -1,4 +1,4 @@
-import { AuthResponse } from '@app/shared/models/auth.model';
+import { AuthResponse, AuthStep } from '@app/shared/models/auth.model';
 import { createAction,  props } from '@ngrx/store';
 
 export const AuthActions = {
@@ -12,5 +12,9 @@ export const AuthActions = {
   clearError: createAction('[Auth] Clear Error'),
   forgotPassword: createAction('[Auth] Forgot Password', props<{ email: string }>()),
   forgotPasswordSuccess: createAction('[Auth] Forgot Password Success'),
-  forgotPasswordFailure: createAction('[Auth] Forgot Password Failure', props<{ error: string }>())
+  forgotPasswordFailure: createAction('[Auth] Forgot Password Failure', props<{ error: string }>()),
+  verifyOtp: createAction('[Auth] Verify OTP', props<{ otp: string }>()),
+  verifyOtpSuccess: createAction('[Auth] Verify OTP Success'),
+  verifyOtpFailure: createAction('[Auth] Verify OTP Failure', props<{ error: string }>()),
+  setAuthStep: createAction('[Auth] Set Auth Step', props<{ step: AuthStep }>())
 };

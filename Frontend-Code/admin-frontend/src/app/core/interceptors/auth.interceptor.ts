@@ -4,7 +4,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { AuthService } from '../services/auth.service';
-import { AuthActions } from '../store/states/auth/auth.actions';
+import { AuthActions } from '@store/states/auth/auth.actions';
 
 export const authInterceptor: HttpInterceptorFn = (
   request: HttpRequest<unknown>,
