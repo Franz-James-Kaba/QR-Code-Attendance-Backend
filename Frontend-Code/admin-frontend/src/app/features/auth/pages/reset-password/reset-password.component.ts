@@ -25,10 +25,6 @@ export class ResetPasswordComponent implements OnInit {
 
   ngOnInit() {
     this.resetPasswordForm = this.fb.group({
-      currentPassword: ['', {
-        validators: [Validators.required],
-        nonNullable: true
-      }],
       newPassword: ['', {
         validators: [
           Validators.required,

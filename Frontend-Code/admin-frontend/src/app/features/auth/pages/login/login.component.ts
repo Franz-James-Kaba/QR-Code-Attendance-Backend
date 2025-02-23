@@ -8,6 +8,7 @@ import { ButtonComponent } from '@shared/components/button/button.component';
 import { AuthActions } from '@store/states/auth/auth.actions';
 import { selectIsLoading, selectAuthError } from '@store/states/auth/auth.selectors';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { amaliTechEmailValidator } from '@app/shared/validators/email.validator';
 
 @Component({
   selector: 'app-login',
@@ -28,7 +29,7 @@ export class LoginComponent {
   private readonly fb = inject(FormBuilder);
 
   loginForm = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
+    email: ['', [Validators.required, Validators.email, amaliTechEmailValidator()]],
     password: ['', [Validators.required, Validators.minLength(6)]]
   });
 

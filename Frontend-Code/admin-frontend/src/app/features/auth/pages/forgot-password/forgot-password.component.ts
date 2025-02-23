@@ -11,12 +11,14 @@ import { OtpInputComponent } from '@app/shared/components/otp-input/otp-input.co
 import { AuthStep } from '@app/shared/models/auth.model';
 import { map, take } from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
+import { amaliTechEmailValidator } from '@app/shared/validators/email.validator';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.component.html',
   styleUrl: './forgot-password.component.css',
-  imports: [InputFieldComponent, ButtonComponent, AsyncPipe, ReactiveFormsModule, OtpInputComponent],
+  imports: [InputFieldComponent, ButtonComponent, AsyncPipe, ReactiveFormsModule, OtpInputComponent, RouterLink],
   standalone: true
 })
 export class ForgotPasswordComponent implements OnInit {
@@ -25,7 +27,7 @@ export class ForgotPasswordComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   forgotPasswordForm = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
+    email: ['', [Validators.required, Validators.email, amaliTechEmailValidator()]],
     otp: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
     newPassword: ['', [Validators.required, Validators.minLength(8)]],
     confirmPassword: ['', [Validators.required]]
