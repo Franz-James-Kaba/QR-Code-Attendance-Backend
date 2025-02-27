@@ -4,7 +4,7 @@ import { IconComponent } from "../icon/icon.component";
 
 interface DropdownItem {
   label: string;
-  icon?: string;
+  icon: string;
   action?: () => void;
 }
 
