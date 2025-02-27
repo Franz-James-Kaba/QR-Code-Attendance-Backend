@@ -4,7 +4,6 @@ import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/ro
 import { filter } from 'rxjs/operators';
 import { BreadcrumbService } from '@core/services/breadcrumb.service';
 import { IconComponent } from '../icon/icon.component';
-import { ButtonComponent } from "../button/button.component";
 
 interface NavItem {
   label: string;
@@ -16,7 +15,7 @@ interface NavItem {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, IconComponent, ButtonComponent],
+  imports: [CommonModule, RouterLink, RouterLinkActive, IconComponent],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css'
 })
