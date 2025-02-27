@@ -54,7 +54,7 @@ export class ButtonComponent {
     const variants = {
       primary: 'bg-black text-white hover:bg-gray-700 focus:ring-gray-500',
       secondary: 'bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500',
-      outline: 'border-2 border-blue-600 text-blue-600 hover:bg-blue-50 focus:ring-blue-500',
+      outline: 'border-2 border-black-600 text-black-600 hover:bg-black-50 focus:ring-black-500',
       danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500'
     };
     return variants[this.variant];

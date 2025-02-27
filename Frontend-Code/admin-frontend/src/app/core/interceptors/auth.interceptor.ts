@@ -4,7 +4,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { AuthService } from '../services/auth.service';
-import { logout } from '../store/states/auth/auth.actions';
+import { AuthActions } from '@store/states/auth/auth.actions';
 
 export const authInterceptor: HttpInterceptorFn = (
   request: HttpRequest<unknown>,
@@ -25,7 +25,7 @@ export const authInterceptor: HttpInterceptorFn = (
   return next(request).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401) {
-        store.dispatch(logout());
+        store.dispatch(AuthActions.logout());
       }
       return throwError(() => error);
     })

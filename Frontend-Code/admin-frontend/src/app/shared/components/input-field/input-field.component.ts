@@ -17,14 +17,14 @@ export class InputFieldComponent implements ControlValueAccessor, OnInit {
   @Input() required = false;
   @Input() disabled = false;
   @Input() showPasswordToggle = false;
-
+  @Input() validateAmalitechEmail = false;
   value: any = '';
   isPassword = false;
   showPassword = false;
   hasError = false;
   touched = false;
 
-  constructor(@Self() @Optional() private ngControl: NgControl) {
+  constructor(@Self() @Optional() private readonly ngControl: NgControl) {
     if (this.ngControl) {
       this.ngControl.valueAccessor = this;
     }
@@ -84,6 +84,7 @@ export class InputFieldComponent implements ControlValueAccessor, OnInit {
       const errors = this.ngControl.errors;
       if (errors['required']) return 'This field is required';
       if (errors['email']) return 'Please enter a valid email';
+      if (errors['amaliTechEmail']) return 'Please enter a valid AmaliTech email address';
       if (errors['minlength']) return `Minimum length is ${errors['minlength'].requiredLength}`;
       if (errors['pattern']) return 'Invalid format';
     }
