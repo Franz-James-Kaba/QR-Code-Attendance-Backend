@@ -1,6 +1,5 @@
 package com.example.attendance_system.user;
 
-import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -19,8 +18,4 @@ public class ResetPasswordRequest {
     @NotBlank(message = "Confirm password is required")
     private String confirmPassword;
 
-    @AssertTrue(message = "Passwords must match")
-    private boolean isPasswordsMatching() {
-        return password != null && password.equals(confirmPassword);
-    }
 }

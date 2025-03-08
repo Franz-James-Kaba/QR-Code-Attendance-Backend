@@ -3,6 +3,7 @@ package com.example.attendance_system.role;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+@Getter
 @RequiredArgsConstructor
 public enum Permission {
 
@@ -12,6 +13,5 @@ public enum Permission {
     ADMIN_DELETE("admin:delete"),
     USER_UPDATE("user:update");
 
-    @Getter
     private final String permission;
 }

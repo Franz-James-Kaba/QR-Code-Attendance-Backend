@@ -11,10 +11,14 @@ import java.util.stream.Collectors;
 
 import static com.example.attendance_system.role.Permission.*;
 
+@Getter
 @RequiredArgsConstructor
 public enum Role {
     USER(Set.of(
             USER_UPDATE
+    )),
+    FACILITATOR(Set.of(
+
     )),
     ADMIN(
             Set.of(
@@ -25,7 +29,6 @@ public enum Role {
             )
     );
 
-    @Getter
     private final Set<Permission> permissions;
 
     public List<SimpleGrantedAuthority> getAuthorities() {

@@ -1,7 +1,7 @@
 package com.example.attendance_system.email;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -11,10 +11,11 @@ import java.util.Properties;
 
 @Configuration
 public class EmailConfiguration {
-    Dotenv dotenv = Dotenv.load();
-    String password = dotenv.get("APP_PASSWORD");
+    @Value("${APP_PASSWORD}")
+    String password;
     @Getter
-    private final String username = dotenv.get("APP_USERNAME");
+    @Value("${APP_USERNAME}")
+    private String username;
 
     @Bean
     public JavaMailSender javaMailSender() {

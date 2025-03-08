@@ -2,6 +2,8 @@ package com.example.attendance_system.user;
 
 import com.example.attendance_system.exceptions.UnauthorizedUserException;
 import com.example.attendance_system.exceptions.UserNotFoundException;
+import com.example.attendance_system.role.FacilitatorRole;
+import com.example.attendance_system.role.UserRole;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,15 +21,19 @@ public class AdminController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) throws MessagingException {
-        userService.createUser(request);
+        userService.createUser(request, new UserRole());
         return ResponseEntity.ok("User registered successfully");
+    }
+
+    @PostMapping("/create-facilitator")
+    public ResponseEntity<String> createFacilitator(@Valid @RequestBody RegisterRequest request) throws MessagingException {
+        return ResponseEntity.ok(userService.createUser(request, new FacilitatorRole()));
     }
 
     @PutMapping("/users/{userId}")
     public ResponseEntity<User> updateUser(@PathVariable("userId") Long userId, @RequestBody UpdateUserRequest request) {
         return ResponseEntity.ok(userService.updateUser(userId, request));
     }
-
 
     @DeleteMapping("users/{userId}")
     public ResponseEntity<String> deleteUser(@PathVariable("userId") Long userId) {
