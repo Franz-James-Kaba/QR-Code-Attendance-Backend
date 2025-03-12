@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
-import { InputFieldComponent } from '../../../../shared/components/input-field/input-field.component';
-import { ButtonComponent } from '../../../../shared/components/button/button.component';
+import { InputFieldComponent } from '@shared/components/input-field/input-field.component';
+import { ButtonComponent } from '@shared/components/button/button.component';
 import { RouterModule } from '@angular/router';
 
 @Component({
@@ -25,10 +25,6 @@ export class ResetPasswordComponent implements OnInit {
 
   ngOnInit() {
     this.resetPasswordForm = this.fb.group({
-      currentPassword: ['', {
-        validators: [Validators.required],
-        nonNullable: true
-      }],
       newPassword: ['', {
         validators: [
           Validators.required,

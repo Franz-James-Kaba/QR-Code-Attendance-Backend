@@ -37,21 +37,32 @@
           />
         </div>
 
+        <!-- Error Message -->
+        @if (error$ | async) {
+          <div class="text-sm text-red-600 mt-2 text-center" role="alert">
+            {{ error$ | async }}
+          </div>
+        }
+
         <!-- Sign In Button -->
         <div class="pt-2">
           <app-button
             type="submit"
-            [disabled]="loginForm.invalid"
+            [disabled]="loginForm.invalid || ((isLoading$ | async) ?? false)"
             [fullWidth]="true"
           >
-            Sign in
+            @if (isLoading$ | async) {
+              <span>Signing in...</span>
+            } @else {
+              <span>Sign in</span>
+            }
           </app-button>
         </div>
 
         <!-- Reset Password Link -->
         <div class="text-center text-sm">
           <span class="text-gray-600">Forgot password? </span>
-          <a routerLink="/auth/reset-password" class="text-gray-900 hover:underline font-medium">
+          <a routerLink="/auth/forgot-password" class="text-gray-900 hover:underline font-medium">
             Reset
           </a>
         </div>
