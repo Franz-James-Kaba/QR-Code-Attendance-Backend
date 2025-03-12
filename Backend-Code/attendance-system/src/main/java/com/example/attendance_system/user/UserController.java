@@ -1,5 +1,6 @@
 package com.example.attendance_system.user;
 
+import com.example.attendance_system.role.AdminRole;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -26,14 +27,8 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/create-admin")
-    public ResponseEntity<String> createAdmin(@RequestBody @Valid RegisterRequest request, BindingResult bindingResult) throws MessagingException {
-        if(bindingResult.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(erorr -> errors.put(erorr.getField(), erorr.getDefaultMessage()));
-            return ResponseEntity.badRequest().body(errors.toString());
-        }
-        return ResponseEntity.ok(userService.createAdmin(request));
-
+    public ResponseEntity<String> createAdmin(@RequestBody @Valid RegisterRequest request) throws MessagingException {
+        return ResponseEntity.ok(userService.createUser(request, new AdminRole()));
     }
 
     @PostMapping("/login")

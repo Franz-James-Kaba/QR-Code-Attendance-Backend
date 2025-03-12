@@ -2,7 +2,11 @@ package com.example.attendance_system.user;
 
 import com.example.attendance_system.config.JWTService;
 import com.example.attendance_system.email.EmailService;
-import com.example.attendance_system.exceptions.*;
+import com.example.attendance_system.exceptions.InvalidTokenException;
+import com.example.attendance_system.exceptions.ResourceNotFoundException;
+import com.example.attendance_system.exceptions.TokenExpiredException;
+import com.example.attendance_system.exceptions.UserNotFoundException;
+import com.example.attendance_system.role.Roles;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,9 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-
-import static com.example.attendance_system.role.Role.ADMIN;
-import static com.example.attendance_system.role.Role.USER;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +34,7 @@ public class UserService {
 
 
 
-    public void createUser(RegisterRequest request) throws MessagingException {
+    public String createUser(RegisterRequest request, Roles role) throws MessagingException {
         String password = passwordGenerator.generatePassword(12);
 
         var user = User.builder()
@@ -43,7 +44,7 @@ public class UserService {
                 .passwordResetRequired(true)
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(password))
-                .role(USER)
+                .role(role.getRole())
                 .build();
          userRepository.save(user);
          emailService.sendMailWithTemporaryPassword(
@@ -51,27 +52,7 @@ public class UserService {
                  user.getFirstName(),
                  password
          );
-
-    }
-
-    public String createAdmin(RegisterRequest request) throws MessagingException {
-        var password = passwordGenerator.generatePassword(12);
-        var user = User.builder()
-                .firstName(request.getFirstName())
-                .middleName(request.getMiddleName())
-                .lastName(request.getLastName())
-                .passwordResetRequired(true)
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(password))
-                .role(ADMIN)
-                .build();
-        userRepository.save(user);
-        emailService.sendMailWithTemporaryPassword(
-                user.getEmail(),
-                user.getFirstName(),
-                password
-        );
-        return "Admin created successfully";
+        return "User created successfully";
     }
 
     public AuthenticationResponse login(AuthenticationRequest request) {
@@ -100,7 +81,7 @@ public class UserService {
         var savedToken = tokenRepository.findByToken(token)
                 .orElseThrow(() -> new ResourceNotFoundException("Token does not exist"));
 
-        validateRequest(email, request, savedToken);
+        validateRequest(email, savedToken);
 
         var user = userRepository.findByEmail(savedToken.getUser().getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -151,12 +132,11 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    private void validateRequest(String email, ResetPasswordRequest request, Token savedToken) {
+    private void validateRequest(String email, Token savedToken) {
         if (!email.equals(savedToken.getUser().getEmail()))
             throw new InvalidTokenException("Invalid token");
 
         if (savedToken.getExpiresAt().isBefore(LocalDateTime.now()))
             throw new TokenExpiredException("Token is expired.");
     }
-
 }
