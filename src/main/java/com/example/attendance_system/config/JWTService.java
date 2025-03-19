@@ -19,12 +19,12 @@ import java.util.function.Function;
 
 @Service
 public class JWTService {
-    private String secretKey = "";
+    private final String secretKey;
     @Value("${application.security.jwt.expiration}")
     private long jwtExpiration;
 
     public JWTService() {
-        KeyGenerator keyGenerator = null;
+        KeyGenerator keyGenerator;
         try {
             keyGenerator = KeyGenerator.getInstance("HmacSHA256");
             SecretKey sk = keyGenerator.generateKey();

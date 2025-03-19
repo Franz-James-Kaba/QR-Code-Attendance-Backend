@@ -34,6 +34,7 @@ public class User implements UserDetails, Principal {
 
     @Column(nullable = false,unique = true)
     private String email;
+    @Builder.Default
     private boolean passwordResetRequired = true;
     @Size(min = 8)
     private String password;
@@ -45,6 +46,7 @@ public class User implements UserDetails, Principal {
     private Role role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @Builder.Default
     private List<Token> tokens = new ArrayList<>();
 
 
