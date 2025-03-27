@@ -1,11 +1,20 @@
-package com.example.attendance_system.user;
+package com.example.attendance_system.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
+import com.example.attendance_system.config.JWTService;
 import com.example.attendance_system.email.EmailService;
+import com.example.attendance_system.exceptions.InvalidTokenException;
 import com.example.attendance_system.exceptions.ResourceNotFoundException;
+import com.example.attendance_system.exceptions.TokenExpiredException;
 import com.example.attendance_system.exceptions.UserNotFoundException;
+import com.example.attendance_system.model.Token;
+import com.example.attendance_system.model.User;
+import com.example.attendance_system.repository.TokenRepository;
+import com.example.attendance_system.repository.UserRepository;
+import com.example.attendance_system.request.AuthenticationRequest;
+import com.example.attendance_system.request.RegisterRequest;
+import com.example.attendance_system.request.ResetPasswordRequest;
+import com.example.attendance_system.request.UpdateUserRequest;
+import com.example.attendance_system.response.AuthenticationResponse;
 import com.example.attendance_system.role.AdminRole;
 import com.example.attendance_system.role.FacilitatorRole;
 import com.example.attendance_system.role.Role;
@@ -18,10 +27,18 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+
+import static com.example.attendance_system.role.Role.USER;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -38,9 +55,17 @@ class UserServiceTest {
     @Mock
     private PasswordGenerator passwordGenerator;
 
-
     @Mock
     private EmailService emailService;
+
+    @Mock
+    private AuthenticationManager authenticationManager;
+
+    @Mock
+    private JWTService jwtService;
+
+    @Mock
+    private TokenService tokenService;
 
     @InjectMocks
     private UserService userService;
@@ -120,10 +145,7 @@ class UserServiceTest {
         assertEquals("User created successfully", result);
 
         // Assert the saved user's role is correct
-        assertEquals(Role.USER, savedUser.getRole());
-
-        // Assert the expected HTTP status code (201 Created)
-        assertEquals(201, 201);  // Static check, consider returning status code in the method
+        assertEquals(USER, savedUser.getRole());
     }
 
 
@@ -157,9 +179,6 @@ class UserServiceTest {
 
         // Assert the saved user's role is correct
         assertEquals(Role.FACILITATOR, savedUser.getRole());
-
-        // Assert the expected HTTP status code (201 Created)
-        assertEquals(201, 201);  // Static check, consider returning status code in the method
     }
 
 
@@ -192,9 +211,6 @@ class UserServiceTest {
 
         // Assert the saved user's role is correct
         assertEquals(Role.ADMIN, savedUser.getRole());
-
-        // Assert the expected HTTP status code (201 Created)
-        assertEquals(201, 201);  // Static check, consider returning status code in the method
     }
 
 
@@ -299,4 +315,136 @@ class UserServiceTest {
 
         assertEquals("User not found", exception.getMessage());
     }
+
+    @Test
+    void testLogin_Success() {
+        user.setRole(USER);
+        AuthenticationRequest authRequest = AuthenticationRequest.builder()
+                .email("john.doe@example.com")
+                .password("password123")
+                .build();
+
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(user);
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(authentication);
+
+        // Mock JWT service
+        when(jwtService.generateToken(user.getUsername())).thenReturn("jwt-token-123");
+
+        AuthenticationResponse response = userService.login(authRequest);
+
+        assertNotNull(response);
+        assertEquals("jwt-token-123", response.getToken());
+        assertEquals(user.getRole().name(), response.getRole());
+        assertEquals(user.isPasswordResetRequired(), response.isPasswordResetRequired());
+
+        ArgumentCaptor<UsernamePasswordAuthenticationToken> authCaptor =
+                ArgumentCaptor.forClass(UsernamePasswordAuthenticationToken.class);
+        verify(authenticationManager).authenticate(authCaptor.capture());
+        assertEquals(authRequest.getEmail(), authCaptor.getValue().getPrincipal());
+        assertEquals(authRequest.getPassword(), authCaptor.getValue().getCredentials());
+    }
+
+    @Test
+    void testLogin_InvalidCredentials() {
+        // Arrange
+        AuthenticationRequest authRequest = AuthenticationRequest.builder()
+                .email("john.doe@example.com")
+                .password("wrongPassword")
+                .build();
+
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenThrow(new BadCredentialsException("Invalid username or password"));
+
+        Exception exception = assertThrows(BadCredentialsException.class, () ->
+                userService.login(authRequest));
+
+        assertEquals("Invalid username or password", exception.getMessage());
+    }
+
+    @Test
+    void testResetPasswordRequest_Success() throws MessagingException {
+        // Arrange
+        String email = "john.doe@example.com";
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(tokenService.generateAndSaveToken(user)).thenReturn("generated-token-123");
+        doNothing().when(emailService).sendPasswordResetEmail(
+                eq(email),
+                eq(user.getFirstName()),
+                eq("generated-token-123")
+        );
+
+        String result = userService.resetPasswordRequest(email);
+
+        assertEquals("Password reset code sent to your email address", result);
+        verify(tokenService, times(1)).generateAndSaveToken(user);
+        verify(emailService, times(1)).sendPasswordResetEmail(
+                email,
+                user.getFirstName(),
+                "generated-token-123"
+        );
+    }
+
+    @Test
+    void testResetPasswordRequest_UserNotFound() throws MessagingException {
+        String email = "nonexistent@example.com";
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+
+        Exception exception = assertThrows(ResourceNotFoundException.class, () ->
+                userService.resetPasswordRequest(email));
+
+        assertEquals("User not found", exception.getMessage());
+        verify(tokenService, never()).generateAndSaveToken(any());
+        verify(emailService, never()).sendPasswordResetEmail(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void testResetPassword_TokenExpired() {
+        String tokenValue = "expired-token";
+        String email = user.getEmail();
+
+        Token expiredToken = new Token();
+        expiredToken.setToken(tokenValue);
+        expiredToken.setUser(user);
+        expiredToken.setExpiresAt(LocalDateTime.now().minusMinutes(10)); // Expired 10 minutes ago
+
+        when(tokenRepository.findByToken(tokenValue)).thenReturn(Optional.of(expiredToken));
+
+        Exception exception = assertThrows(TokenExpiredException.class, () ->
+                userService.resetPassword(tokenValue, email, resetPasswordRequest));
+
+        assertEquals("Token is expired.", exception.getMessage());
+        verify(userRepository, never()).save(any());
+        verify(tokenRepository, never()).delete(any());
+    }
+
+    @Test
+    void testResetPassword_InvalidEmail() {
+        String tokenValue = "valid-token";
+        String wrongEmail = "wrong.email@example.com";
+
+        when(tokenRepository.findByToken(tokenValue)).thenReturn(Optional.of(token));
+
+        Exception exception = assertThrows(InvalidTokenException.class, () ->
+                userService.resetPassword(tokenValue, wrongEmail, resetPasswordRequest));
+
+        assertEquals("Invalid token", exception.getMessage());
+        verify(userRepository, never()).save(any());
+        verify(tokenRepository, never()).delete(any());
+    }
+
+    @Test
+    void testUpdateUser_UserNotFound() {
+        Long nonExistentUserId = 999L;
+        when(userRepository.findById(nonExistentUserId)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(ResourceNotFoundException.class, () ->
+                userService.updateUser(nonExistentUserId, updateUserRequest));
+
+        assertEquals("User not found", exception.getMessage());
+        verify(userRepository, never()).save(any());
+    }
+
 }

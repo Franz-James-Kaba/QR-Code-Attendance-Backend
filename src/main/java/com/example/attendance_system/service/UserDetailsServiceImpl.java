@@ -1,5 +1,6 @@
-package com.example.attendance_system.user;
+package com.example.attendance_system.service;
 
+import com.example.attendance_system.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

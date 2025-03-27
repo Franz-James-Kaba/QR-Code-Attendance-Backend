@@ -1,6 +1,11 @@
-package com.example.attendance_system.user;
+package com.example.attendance_system.controller;
 
+import com.example.attendance_system.request.AuthenticationRequest;
+import com.example.attendance_system.request.RegisterRequest;
+import com.example.attendance_system.request.ResetPasswordRequest;
+import com.example.attendance_system.response.AuthenticationResponse;
 import com.example.attendance_system.role.AdminRole;
+import com.example.attendance_system.service.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;

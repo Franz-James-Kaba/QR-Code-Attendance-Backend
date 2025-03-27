@@ -1,4 +1,4 @@
-package com.example.attendance_system.user;
+package com.example.attendance_system.service;
 
 import com.example.attendance_system.config.JWTService;
 import com.example.attendance_system.email.EmailService;
@@ -6,6 +6,15 @@ import com.example.attendance_system.exceptions.InvalidTokenException;
 import com.example.attendance_system.exceptions.ResourceNotFoundException;
 import com.example.attendance_system.exceptions.TokenExpiredException;
 import com.example.attendance_system.exceptions.UserNotFoundException;
+import com.example.attendance_system.model.Token;
+import com.example.attendance_system.model.User;
+import com.example.attendance_system.repository.TokenRepository;
+import com.example.attendance_system.repository.UserRepository;
+import com.example.attendance_system.request.AuthenticationRequest;
+import com.example.attendance_system.request.RegisterRequest;
+import com.example.attendance_system.request.ResetPasswordRequest;
+import com.example.attendance_system.request.UpdateUserRequest;
+import com.example.attendance_system.response.AuthenticationResponse;
 import com.example.attendance_system.role.Roles;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
