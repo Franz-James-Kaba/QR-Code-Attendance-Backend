@@ -1,0 +1,74 @@
+name: Unit Tests CI
+
+on:
+  push:
+    branches:
+      - testing
+      - develop
+  pull_request:
+    branches:
+      - testing
+      - develop
+  workflow_dispatch:
+
+jobs:
+  junit-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Set up JDK 21  # Ensure this matches your project's requirements
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '21'  # Changed from 11 to 21 to match your project's Java version
+
+    - name: Verify Java Version
+      run: java -version
+
+    - name: Set up Maven
+      run: mvn -version
+
+    - name: Run JUnit Tests
+      id: run-tests
+      run: |
+        mvn clean test | tee test_output.log
+
+    - name: Upload Test Logs
+      uses: actions/upload-artifact@v4
+      with:
+        name: junit-test-logs
+        path: test_output.log
+
+    - name: Send Email on Failure
+      if: failure()
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: ${{ secrets.SMTP_SERVER }}
+        username: ${{ secrets.SMTP_USERNAME }}
+        password: ${{ secrets.SMTP_PASSWORD }}
+        subject: "JUnit Test Failure"
+        body: |
+          ❌ The JUnit tests **FAILED**.
+          Please check the logs for details.
+          🔗 [Run Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+        to: "${{ secrets.FRANZ_EMAIL }},${{ secrets.BERNARD_EMAIL }},${{ secrets.JULIUS_EMAIL }}"
+        from: "GitHub Actions"
+
+    - name: Send Email on Success
+      if: success()
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: ${{ secrets.SMTP_SERVER }}
+        username: ${{ secrets.SMTP_USERNAME }}
+        password: ${{ secrets.SMTP_PASSWORD }}
+        subject: "JUnit Test Execution Success ✅"
+        body: |
+          ✅ The JUnit tests executed successfully!
+          **Test Results:** ${{ job.status }}
+          📄 Logs have been uploaded as an artifact.  
+          🔗 [Run Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+        to: "${{ secrets.FRANZ_EMAIL }},${{ secrets.BERNARD_EMAIL }},${{ secrets.JULIUS_EMAIL }}"
+        from: "GitHub Actions"
