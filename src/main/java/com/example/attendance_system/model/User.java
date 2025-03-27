@@ -1,4 +1,4 @@
-package com.example.attendance_system.user;
+package com.example.attendance_system.model;
 
 import com.example.attendance_system.role.Role;
 import jakarta.persistence.*;

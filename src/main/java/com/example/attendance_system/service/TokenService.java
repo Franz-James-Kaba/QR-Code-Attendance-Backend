@@ -1,5 +1,8 @@
-package com.example.attendance_system.user;
+package com.example.attendance_system.service;
 
+import com.example.attendance_system.model.Token;
+import com.example.attendance_system.model.User;
+import com.example.attendance_system.repository.TokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

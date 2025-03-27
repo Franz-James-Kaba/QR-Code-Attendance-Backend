@@ -1,9 +1,13 @@
-package com.example.attendance_system.user;
+package com.example.attendance_system.controller;
 
 import com.example.attendance_system.exceptions.UnauthorizedUserException;
 import com.example.attendance_system.exceptions.UserNotFoundException;
 import com.example.attendance_system.role.FacilitatorRole;
 import com.example.attendance_system.role.UserRole;
+import com.example.attendance_system.request.RegisterRequest;
+import com.example.attendance_system.request.UpdateUserRequest;
+import com.example.attendance_system.model.User;
+import com.example.attendance_system.service.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
