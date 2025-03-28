@@ -152,7 +152,7 @@ public class UserService {
 
     //
     public Page<User> getAllNsps(Pageable pageable) {
-        return userRepository.findByRole(Role.USER, pageable);
+        return userRepository.findByRole(Role.NSP, pageable);
 
     }
 
