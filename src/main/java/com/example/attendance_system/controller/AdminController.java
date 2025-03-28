@@ -4,7 +4,7 @@ import com.example.attendance_system.dto.UserDTO;
 import com.example.attendance_system.exceptions.UnauthorizedUserException;
 import com.example.attendance_system.exceptions.UserNotFoundException;
 import com.example.attendance_system.role.FacilitatorRole;
-import com.example.attendance_system.role.UserRole;
+import com.example.attendance_system.role.NSPRole;
 import com.example.attendance_system.request.RegisterRequest;
 import com.example.attendance_system.request.UpdateUserRequest;
 import com.example.attendance_system.model.User;
@@ -31,9 +31,9 @@ import java.util.Map;
 public class AdminController {
     private final UserService userService;
 
-    @PostMapping("/register")
+    @PostMapping("/create-nsp")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) throws MessagingException {
-        userService.createUser(request, new UserRole());
+        userService.createUser(request, new NSPRole());
         return ResponseEntity.ok("User registered successfully");
     }
 
