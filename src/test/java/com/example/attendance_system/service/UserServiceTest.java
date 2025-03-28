@@ -18,7 +18,7 @@ import com.example.attendance_system.response.AuthenticationResponse;
 import com.example.attendance_system.role.AdminRole;
 import com.example.attendance_system.role.FacilitatorRole;
 import com.example.attendance_system.role.Role;
-import com.example.attendance_system.role.UserRole;
+import com.example.attendance_system.role.NSPRole;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static com.example.attendance_system.role.Role.USER;
+import static com.example.attendance_system.role.Role.NSP;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -127,7 +127,7 @@ class UserServiceTest {
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
 
         // Act
-        String result = userService.createUser(request, new UserRole());
+        String result = userService.createUser(request, new NSPRole());
 
         // Assert
         // Verify the user is saved and capture the actual User object
@@ -145,7 +145,7 @@ class UserServiceTest {
         assertEquals("User created successfully", result);
 
         // Assert the saved user's role is correct
-        assertEquals(USER, savedUser.getRole());
+        assertEquals(NSP, savedUser.getRole());
     }
 
 
@@ -318,7 +318,7 @@ class UserServiceTest {
 
     @Test
     void testLogin_Success() {
-        user.setRole(USER);
+        user.setRole(NSP);
         AuthenticationRequest authRequest = AuthenticationRequest.builder()
                 .email("john.doe@example.com")
                 .password("password123")
