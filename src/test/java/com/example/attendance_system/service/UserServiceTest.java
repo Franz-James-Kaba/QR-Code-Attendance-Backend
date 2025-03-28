@@ -17,8 +17,8 @@ import com.example.attendance_system.request.UpdateUserRequest;
 import com.example.attendance_system.response.AuthenticationResponse;
 import com.example.attendance_system.role.AdminRole;
 import com.example.attendance_system.role.FacilitatorRole;
-import com.example.attendance_system.role.Role;
 import com.example.attendance_system.role.NSPRole;
+import com.example.attendance_system.role.Role;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -487,12 +486,12 @@ class UserServiceTest {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
         List<User> userList = Arrays.asList(
-                createUserWithRole(Role.USER),
-                createUserWithRole(Role.USER)
+                createUserWithRole(Role.NSP),
+                createUserWithRole(Role.NSP)
         );
         Page<User> userPage = new PageImpl<>(userList, pageable, userList.size());
 
-        when(userRepository.findByRole(eq(Role.USER), eq(pageable))).thenReturn(userPage);
+        when(userRepository.findByRole(eq(Role.NSP), eq(pageable))).thenReturn(userPage);
 
         // Act
         Page<User> result = userService.getAllNsps(pageable);
@@ -500,8 +499,8 @@ class UserServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(2, result.getContent().size());
-        assertTrue(result.getContent().stream().allMatch(u -> u.getRole() == Role.USER));
-        verify(userRepository).findByRole(eq(Role.USER), eq(pageable));
+        assertTrue(result.getContent().stream().allMatch(u -> u.getRole() == Role.NSP));
+        verify(userRepository).findByRole(eq(Role.NSP), eq(pageable));
     }
 
 
@@ -511,7 +510,7 @@ class UserServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<User> emptyPage = new PageImpl<>(Collections.emptyList(), pageable, 0);
 
-        when(userRepository.findByRole(eq(Role.USER), eq(pageable))).thenReturn(emptyPage);
+        when(userRepository.findByRole(eq(Role.NSP), eq(pageable))).thenReturn(emptyPage);
 
         // Act
         Page<User> result = userService.getAllNsps(pageable);
@@ -519,7 +518,7 @@ class UserServiceTest {
         // Assert
         assertNotNull(result);
         assertTrue(result.getContent().isEmpty());
-        verify(userRepository).findByRole(eq(Role.USER), eq(pageable));
+        verify(userRepository).findByRole(eq(Role.NSP), eq(pageable));
     }
 
     @Test
