@@ -14,7 +14,7 @@ import static com.example.attendance_system.role.Permission.*;
 @Getter
 @RequiredArgsConstructor
 public enum  Role {
-    USER(Set.of(
+    NSP(Set.of(
             USER_UPDATE
     )),
     FACILITATOR(Set.of(

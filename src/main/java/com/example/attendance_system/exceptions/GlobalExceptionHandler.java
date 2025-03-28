@@ -1,6 +1,8 @@
 package com.example.attendance_system.exceptions;
 
 import io.jsonwebtoken.security.SignatureException;
+import jakarta.validation.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -54,6 +56,23 @@ public class GlobalExceptionHandler {
                 .code(UNAUTHORIZED.value())
                 .build();
         return new ResponseEntity<>(error, UNAUTHORIZED);
+    }
+
+    @ExceptionHandler({DataIntegrityViolationException.class,
+            ConstraintViolationException.class})
+    public ResponseEntity<ErrorResponse> handleConstraintViolation(Exception ex) {
+        String message = "Data integrity violation";
+
+        if (ex.getCause() != null &&
+                ex.getCause().getMessage().contains("duplicate key value violates unique constraint")) {
+            message = "A user with this email already exists.";
+        }
+
+        var error = ErrorResponse.builder()
+                .message(message)
+                .code(CONFLICT.value())
+                .build();
+        return new ResponseEntity<>(error, CONFLICT);
     }
 
 }
