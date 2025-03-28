@@ -31,10 +31,15 @@ jobs:
     - name: Set up Maven
       run: mvn -version
 
+    - name: Compile Code  # Ensure compilation errors fail the build
+      run: |
+        mvn clean compile -B
+      continue-on-error: false  # Ensure failure stops workflow
+
     - name: Run JUnit Tests
       id: run-tests
       run: |
-        mvn clean test -B -Dmaven.test.failure.ignore=false | tee test_output.log
+        mvn test -B -Dmaven.test.failure.ignore=false | tee test_output.log
         if grep -q "[ERROR] Tests run:" test_output.log; then
           echo "❌ Test failures detected!"
           exit 1
@@ -53,10 +58,10 @@ jobs:
         server_address: ${{ secrets.SMTP_SERVER }}
         username: ${{ secrets.SMTP_USERNAME }}
         password: ${{ secrets.SMTP_PASSWORD }}
-        subject: "JUnit Test Failure"
+        subject: "🚨 Build Failure: Compilation or Test Errors"
         body: |
-          ❌ The JUnit tests **FAILED**.
-          Please check the logs for details.
+          ❌ The build **FAILED** due to a compilation error or test failure.
+          **Error Type:** Compilation/Test Failure
           🔗 [Run Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
         to: "${{ secrets.FRANZ_EMAIL }},${{ secrets.BERNARD_EMAIL }},${{ secrets.JULIUS_EMAIL }}"
         from: "GitHub Actions"
@@ -68,7 +73,7 @@ jobs:
         server_address: ${{ secrets.SMTP_SERVER }}
         username: ${{ secrets.SMTP_USERNAME }}
         password: ${{ secrets.SMTP_PASSWORD }}
-        subject: "JUnit Test Execution Success ✅"
+        subject: "✅ JUnit Test Execution Success"
         body: |
           ✅ The JUnit tests executed successfully!
           **Test Results:** ${{ job.status }}
