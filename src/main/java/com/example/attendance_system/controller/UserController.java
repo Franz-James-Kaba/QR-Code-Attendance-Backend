@@ -1,6 +1,11 @@
-package com.example.attendance_system.user;
+package com.example.attendance_system.controller;
 
+import com.example.attendance_system.request.AuthenticationRequest;
+import com.example.attendance_system.request.RegisterRequest;
+import com.example.attendance_system.request.ResetPasswordRequest;
+import com.example.attendance_system.response.AuthenticationResponse;
 import com.example.attendance_system.role.AdminRole;
+import com.example.attendance_system.service.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -10,13 +15,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController

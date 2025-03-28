@@ -1,4 +1,4 @@
-package com.example.attendance_system.user;
+package com.example.attendance_system.response;
 
 import lombok.Builder;
 import lombok.Getter;

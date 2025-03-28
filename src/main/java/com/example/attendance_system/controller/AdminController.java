@@ -1,9 +1,13 @@
-package com.example.attendance_system.user;
+package com.example.attendance_system.controller;
 
 import com.example.attendance_system.exceptions.UnauthorizedUserException;
 import com.example.attendance_system.exceptions.UserNotFoundException;
 import com.example.attendance_system.role.FacilitatorRole;
-import com.example.attendance_system.role.UserRole;
+import com.example.attendance_system.role.NSPRole;
+import com.example.attendance_system.request.RegisterRequest;
+import com.example.attendance_system.request.UpdateUserRequest;
+import com.example.attendance_system.model.User;
+import com.example.attendance_system.service.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -20,9 +23,9 @@ import org.springframework.web.server.ResponseStatusException;
 public class AdminController {
     private final UserService userService;
 
-    @PostMapping("/register")
+    @PostMapping("/create-nsp")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) throws MessagingException {
-        userService.createUser(request, new UserRole());
+        userService.createUser(request, new NSPRole());
         return ResponseEntity.ok("User registered successfully");
     }
 
@@ -36,7 +39,7 @@ public class AdminController {
         return ResponseEntity.ok(userService.updateUser(userId, request));
     }
 
-    @DeleteMapping("users/{userId}")
+    @DeleteMapping("/users/{userId}")
     public ResponseEntity<String> deleteUser(@PathVariable("userId") Long userId) {
         try {
             userService.deleteUser(userId);
