@@ -19,11 +19,11 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Set up JDK 21  # Ensure this matches your project's requirements
+    - name: Set up JDK 21
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: '21'  # Changed from 11 to 21 to match your project's Java version
+        java-version: '21'
 
     - name: Verify Java Version
       run: java -version
@@ -34,7 +34,11 @@ jobs:
     - name: Run JUnit Tests
       id: run-tests
       run: |
-        mvn clean test | tee test_output.log
+        mvn clean test -B -Dmaven.test.failure.ignore=false | tee test_output.log
+        if grep -q "[ERROR] Tests run:" test_output.log; then
+          echo "❌ Test failures detected!"
+          exit 1
+        fi
 
     - name: Upload Test Logs
       uses: actions/upload-artifact@v4
