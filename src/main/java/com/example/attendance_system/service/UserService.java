@@ -15,9 +15,12 @@ import com.example.attendance_system.request.RegisterRequest;
 import com.example.attendance_system.request.ResetPasswordRequest;
 import com.example.attendance_system.request.UpdateUserRequest;
 import com.example.attendance_system.response.AuthenticationResponse;
+import com.example.attendance_system.role.Role;
 import com.example.attendance_system.role.Roles;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -138,6 +141,26 @@ public class UserService {
 
         userRepository.delete(user);
     }
+
+
+
+    // getting user with email
+    public User getUserByEmail(String email) {
+      return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found"));
+
+    }
+
+    //
+    public Page<User> getAllNsps(Pageable pageable) {
+        return userRepository.findByRole(Role.USER, pageable);
+
+    }
+
+    //getting a facilitator
+    public Page<User> getAllFacilitators(Pageable pageable) {
+        return userRepository.findByRole(Role.FACILITATOR, pageable);
+    }
+
 
     private void validateRequest(String email, Token savedToken) {
         if (!email.equals(savedToken.getUser().getEmail()))
