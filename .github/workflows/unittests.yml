@@ -62,9 +62,10 @@ jobs:
       uses: dawidd6/action-send-mail@v3
       with:
         server_address: ${{ secrets.SMTP_SERVER }}
+        server_port: 25
         username: ${{ secrets.SMTP_USERNAME }}
         password: ${{ secrets.SMTP_PASSWORD }}
-        subject: "JUnit Test Execution Success ✅"
+        subject: "✅ JUnit Test Execution Success"
         body: |
           ✅ The JUnit tests executed successfully!
           **Test Results:** ${{ job.status }}
