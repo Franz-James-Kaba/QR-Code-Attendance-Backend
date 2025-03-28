@@ -80,5 +80,5 @@ jobs:
           **Test Results:** ${{ job.status }}
           📄 Logs have been uploaded as an artifact.  
           🔗 [Run Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
-        to: "${{ secrets.FRANZ_EMAIL }},${{ secrets.BERNARD_EMAIL }},${{ secrets.JULIUS_EMAIL }},${{secrets.JIMMY_EMAIL}},${{IGNATUS_EMAIL}}"
+        to: "${{ secrets.FRANZ_EMAIL }},${{ secrets.BERNARD_EMAIL }},${{ secrets.JULIUS_EMAIL }},${{secrets.JIMMY_EMAIL}},${{secrets.IGNATUS_EMAIL}}"
         from: "GitHub Actions"
