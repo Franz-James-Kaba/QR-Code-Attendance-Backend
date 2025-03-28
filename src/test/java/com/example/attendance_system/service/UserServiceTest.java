@@ -26,7 +26,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,6 +39,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static com.example.attendance_system.role.Role.NSP;
@@ -447,4 +455,99 @@ class UserServiceTest {
         verify(userRepository, never()).save(any());
     }
 
+    @Test
+    void testGetUserByEmail_Success() {
+        // Arrange
+        String email = "john.doe@example.com";
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+
+        // Act
+        User foundUser = userService.getUserByEmail(email);
+
+        // Assert
+        assertNotNull(foundUser);
+        assertEquals(email, foundUser.getEmail());
+        verify(userRepository).findByEmail(email);
+    }
+
+    @Test
+    void testGetUserByEmail_UserNotFound() {
+        // Arrange
+        String email = "nonexistent@example.com";
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(UserNotFoundException.class, () -> {
+            userService.getUserByEmail(email);
+        });
+    }
+
+    @Test
+    void testGetAllNsps_Success() {
+        // Arrange
+        Pageable pageable = PageRequest.of(0, 10);
+        List<User> userList = Arrays.asList(
+                createUserWithRole(Role.USER),
+                createUserWithRole(Role.USER)
+        );
+        Page<User> userPage = new PageImpl<>(userList, pageable, userList.size());
+
+        when(userRepository.findByRole(eq(Role.USER), eq(pageable))).thenReturn(userPage);
+
+        // Act
+        Page<User> result = userService.getAllNsps(pageable);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(2, result.getContent().size());
+        assertTrue(result.getContent().stream().allMatch(u -> u.getRole() == Role.USER));
+        verify(userRepository).findByRole(eq(Role.USER), eq(pageable));
+    }
+
+
+    @Test
+    void testGetAllNsps_NoUsersFound() {
+        // Arrange
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<User> emptyPage = new PageImpl<>(Collections.emptyList(), pageable, 0);
+
+        when(userRepository.findByRole(eq(Role.USER), eq(pageable))).thenReturn(emptyPage);
+
+        // Act
+        Page<User> result = userService.getAllNsps(pageable);
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.getContent().isEmpty());
+        verify(userRepository).findByRole(eq(Role.USER), eq(pageable));
+    }
+
+    @Test
+    void testGetAllFacilitators_Success() {
+        // Arrange
+        Pageable pageable = PageRequest.of(0, 10);
+        List<User> facilitatorList = Arrays.asList(
+                createUserWithRole(Role.FACILITATOR),
+                createUserWithRole(Role.FACILITATOR)
+        );
+        Page<User> facilitatorPage = new PageImpl<>(facilitatorList, pageable, facilitatorList.size());
+
+        when(userRepository.findByRole(eq(Role.FACILITATOR), eq(pageable))).thenReturn(facilitatorPage);
+
+        // Act
+        Page<User> result = userService.getAllFacilitators(pageable);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(2, result.getContent().size());
+        assertTrue(result.getContent().stream().allMatch(u -> u.getRole() == Role.FACILITATOR));
+        verify(userRepository).findByRole(eq(Role.FACILITATOR), eq(pageable));
+    }
+
+    private User createUserWithRole(Role role) {
+        User user = new User();
+        user.setRole(role);
+        user.setEmail(role.name().toLowerCase() + "@example.com");
+        return user;
+    }
 }
