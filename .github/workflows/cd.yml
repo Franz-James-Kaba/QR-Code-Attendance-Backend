@@ -30,10 +30,8 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: qrcode_repository
-          IMAGE_TAG: ${{ github.sha | slice(0,7) }}
+          IMAGE_TAG: ${{github.sha}}
         run: |
-          set -euo pipefail 
-          
           echo "Building Docker image..."
           docker build \
             -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
