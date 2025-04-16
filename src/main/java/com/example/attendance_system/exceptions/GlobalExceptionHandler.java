@@ -5,8 +5,13 @@ import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -75,4 +80,39 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, CONFLICT);
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ValidationErrorResponse> handleException(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+
+        var error = ValidationErrorResponse.builder()
+                .message("Validation failed")
+                .fieldErrors(errors)
+                .code(BAD_REQUEST.value())
+                .build();
+
+        return new ResponseEntity<>(error, BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleException(UserNotFoundException ex) {
+        var error = ErrorResponse.builder()
+                .message(ex.getMessage())
+                .code(NOT_FOUND.value())
+                .build();
+        return new ResponseEntity<>(error, NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvalidSessionException.class)
+    public ResponseEntity<ErrorResponse> handleException(InvalidSessionException ex) {
+        var error = ErrorResponse.builder()
+                .message(ex.getMessage())
+                .code(BAD_REQUEST.value())
+                .build();
+        return new ResponseEntity<>(error, BAD_REQUEST);
+    }
 }
