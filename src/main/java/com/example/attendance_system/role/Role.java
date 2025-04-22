@@ -20,12 +20,16 @@ public enum  Role {
     FACILITATOR(Set.of(
 
     )),
+    RECEPTION(Set.of(
+            GENERATE_QRCODE
+    )),
     ADMIN(
             Set.of(
                     ADMIN_CREATE,
                     ADMIN_UPDATE,
                     ADMIN_READ,
-                    ADMIN_DELETE
+                    ADMIN_DELETE,
+                    GENERATE_QRCODE
             )
     );
 

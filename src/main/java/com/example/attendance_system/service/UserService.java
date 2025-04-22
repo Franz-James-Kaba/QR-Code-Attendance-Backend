@@ -27,8 +27,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+
+import static com.example.attendance_system.role.Role.FACILITATOR;
+import static com.example.attendance_system.role.Role.RECEPTION;
 
 @Service
 @RequiredArgsConstructor
@@ -150,15 +154,40 @@ public class UserService {
 
     }
 
-    //
     public Page<User> getAllNsps(Pageable pageable) {
         return userRepository.findByRole(Role.NSP, pageable);
 
     }
 
+    @Transactional
+    public String grantReceptionPrivilege(String email) {
+        var user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (!user.getRole().equals(FACILITATOR))
+            return "Only facilitators should be granted reception privilege";
+
+        user.setRole(RECEPTION);
+        userRepository.save(user);
+        return "Reception privilege granted";
+    }
+
+    @Transactional
+    public String revokeReceptionPrivilege(String email) {
+        var user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (!user.getRole().equals(RECEPTION))
+            return "Only receptionists should have reception privilege revoked";
+
+        user.setRole(FACILITATOR);
+        userRepository.save(user);
+        return "Reception privilege revoked";
+    }
+
     //getting a facilitator
     public Page<User> getAllFacilitators(Pageable pageable) {
-        return userRepository.findByRole(Role.FACILITATOR, pageable);
+        return userRepository.findByRole(FACILITATOR, pageable);
     }
 
 
@@ -169,4 +198,5 @@ public class UserService {
         if (savedToken.getExpiresAt().isBefore(LocalDateTime.now()))
             throw new TokenExpiredException("Token is expired.");
     }
+
 }

@@ -115,4 +115,22 @@ public class GlobalExceptionHandler {
                 .build();
         return new ResponseEntity<>(error, BAD_REQUEST);
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleException(IllegalStateException ex) {
+        var error = ErrorResponse.builder()
+                .message(ex.getMessage())
+                .code(BAD_REQUEST.value())
+                .build();
+        return new ResponseEntity<>(error, BAD_REQUEST);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleException(IllegalArgumentException ex) {
+        var error = ErrorResponse.builder()
+                .message(ex.getMessage())
+                .code(BAD_REQUEST.value())
+                .build();
+        return new ResponseEntity<>(error, BAD_REQUEST);
+    }
 }

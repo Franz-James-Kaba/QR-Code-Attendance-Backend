@@ -17,7 +17,7 @@ import static org.springframework.http.MediaType.IMAGE_PNG;
 @RestController
 @RequestMapping("/api/session")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasAuthority('qrcode:generate')")
 public class SessionController {
     private final SessionService service;
 
