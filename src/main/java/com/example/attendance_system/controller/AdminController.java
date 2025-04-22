@@ -1,35 +1,46 @@
 package com.example.attendance_system.controller;
 
 import com.example.attendance_system.dto.UserDTO;
+import com.example.attendance_system.exceptions.AttendanceServiceException;
 import com.example.attendance_system.exceptions.UnauthorizedUserException;
 import com.example.attendance_system.exceptions.UserNotFoundException;
+import com.example.attendance_system.model.Attendance;
 import com.example.attendance_system.role.FacilitatorRole;
 import com.example.attendance_system.role.NSPRole;
 import com.example.attendance_system.request.RegisterRequest;
 import com.example.attendance_system.request.UpdateUserRequest;
 import com.example.attendance_system.model.User;
+import com.example.attendance_system.service.AttendanceService;
 import com.example.attendance_system.service.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
 @PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
+@Slf4j
 public class AdminController {
     private final UserService userService;
+    private final AttendanceService attendanceService;
 
     @PostMapping("/create-nsp")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) throws MessagingException {
@@ -112,6 +123,35 @@ public class AdminController {
                 return buildErrorResponse("You are not authorized to perform this action", HttpStatus.FORBIDDEN);
             }
         }
+
+        //get early attendee
+
+    @GetMapping("/early-attendees")
+    public ResponseEntity<?> getEarlyAttendees(
+            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "100") int size) {
+
+        try {
+            Page<Attendance> earlyAttendees = attendanceService.getEarlyAttendees(startDate, endDate, page, size);
+            return ResponseEntity.ok(earlyAttendees);
+        } catch (IllegalArgumentException e) {
+            log.warn("Invalid request parameters: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        } catch (AttendanceServiceException e) {
+            log.error("Service error while getting early attendees", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("Failed to retrieve early attendees"));
+        }
+    }
+
+    // Simple error response class
+    @Data
+    private static class ErrorResponse {
+        private final String message;
+        private final LocalDateTime timestamp = LocalDateTime.now();
+    }
 
 
         //Helper method to handle error messages
