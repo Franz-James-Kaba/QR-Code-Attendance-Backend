@@ -11,10 +11,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+import java.time.LocalDate;
+import java.util.Optional;
+
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     @Query("SELECT a FROM Attendance a WHERE a.checkInTime >= :startDateTime AND a.checkInTime <= :endDateTime")
     Page<Attendance> findAttendeesBetweenDates(
             @Param("startDateTime") LocalDateTime startDateTime,
             @Param("endDateTime") LocalDateTime endDateTime,
             Pageable pageable);
+    Optional<Attendance> findByUserIdAndDate(Long userId, LocalDate date);
+    boolean existsByDate(LocalDate today);
 }
