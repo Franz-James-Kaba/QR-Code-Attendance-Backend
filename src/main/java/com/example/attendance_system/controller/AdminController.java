@@ -60,65 +60,75 @@ public class AdminController {
     }
 
 
-        @GetMapping("/users")
-        public ResponseEntity<?> getUser(@RequestParam("email") @Valid String email) {
-            try {
-                User user = userService.getUserByEmail(email);
-                UserDTO userDTO = UserDTO.fromUser(user);
-                return ResponseEntity.ok(userDTO);
-            } catch (UserNotFoundException e) {
-                return buildErrorResponse("User not found", HttpStatus.NOT_FOUND);
-            } catch (UnauthorizedUserException e) {
-                return buildErrorResponse("You are not authorized to perform this action", HttpStatus.FORBIDDEN);
-            }
-        }
-
-        @GetMapping("/users/nsps")
-        public ResponseEntity<?> getAllUsers(
-                @RequestParam(defaultValue = "1") int page,
-                @RequestParam(defaultValue = "10") int size
-        ) {
-            try {
-                Pageable pageable = PageRequest.of(page - 1, size, Sort.by("email").ascending());
-                Page<User> users = userService.getAllNsps(pageable);
-
-                // Map User to UserDTO
-                Page<UserDTO> userDTOs = users.map(UserDTO::fromUser);
-
-                return ResponseEntity.ok(userDTOs);
-            } catch (UserNotFoundException e) {
-                return buildErrorResponse("User not found", HttpStatus.NOT_FOUND);
-            } catch (UnauthorizedUserException e) {
-                return buildErrorResponse("You are not authorized to perform this action", HttpStatus.FORBIDDEN);
-            }
-        }
-
-        @GetMapping("/users/facilitators")
-        public ResponseEntity<?> getAllFacilitators(
-                @RequestParam(defaultValue = "0") int page,
-                @RequestParam(defaultValue = "10") int size
-        ) {
-            try {
-                Pageable pageable = PageRequest.of(page, size, Sort.by("email").ascending());
-                Page<User> users = userService.getAllFacilitators(pageable);
-
-                // Map User to UserDTO
-                Page<UserDTO> userDTOs = users.map(UserDTO::fromUser);
-
-                return ResponseEntity.ok(userDTOs);
-            } catch (UserNotFoundException e) {
-                return buildErrorResponse("There are no facilitators", HttpStatus.NOT_FOUND);
-            } catch (UnauthorizedUserException e) {
-                return buildErrorResponse("You are not authorized to perform this action", HttpStatus.FORBIDDEN);
-            }
-        }
-
-
-        //Helper method to handle error messages
-        private ResponseEntity<Map<String, String>> buildErrorResponse(String message, HttpStatus status) {
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", message);
-            return ResponseEntity.status(status).body(errorResponse);
+    @GetMapping("/users")
+    public ResponseEntity<?> getUser(@RequestParam("email") @Valid String email) {
+        try {
+            User user = userService.getUserByEmail(email);
+            UserDTO userDTO = UserDTO.fromUser(user);
+            return ResponseEntity.ok(userDTO);
+        } catch (UserNotFoundException e) {
+            return buildErrorResponse("User not found", HttpStatus.NOT_FOUND);
+        } catch (UnauthorizedUserException e) {
+            return buildErrorResponse("You are not authorized to perform this action", HttpStatus.FORBIDDEN);
         }
     }
+
+    @GetMapping("/users/nsps")
+    public ResponseEntity<?> getAllUsers(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        try {
+            Pageable pageable = PageRequest.of(page - 1, size, Sort.by("email").ascending());
+            Page<User> users = userService.getAllNsps(pageable);
+
+            // Map User to UserDTO
+            Page<UserDTO> userDTOs = users.map(UserDTO::fromUser);
+
+            return ResponseEntity.ok(userDTOs);
+        } catch (UserNotFoundException e) {
+            return buildErrorResponse("User not found", HttpStatus.NOT_FOUND);
+        } catch (UnauthorizedUserException e) {
+            return buildErrorResponse("You are not authorized to perform this action", HttpStatus.FORBIDDEN);
+        }
+    }
+
+    @GetMapping("/users/facilitators")
+    public ResponseEntity<?> getAllFacilitators(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        try {
+            Pageable pageable = PageRequest.of(page, size, Sort.by("email").ascending());
+            Page<User> users = userService.getAllFacilitators(pageable);
+
+            // Map User to UserDTO
+            Page<UserDTO> userDTOs = users.map(UserDTO::fromUser);
+
+            return ResponseEntity.ok(userDTOs);
+        } catch (UserNotFoundException e) {
+            return buildErrorResponse("There are no facilitators", HttpStatus.NOT_FOUND);
+        } catch (UnauthorizedUserException e) {
+            return buildErrorResponse("You are not authorized to perform this action", HttpStatus.FORBIDDEN);
+        }
+    }
+
+    @PostMapping("/grant-reception-privilege/{email}")
+    public ResponseEntity<String> grantReceptionPrivilege(@PathVariable("email") String email) {
+        return ResponseEntity.ok(userService.grantReceptionPrivilege(email));
+    }
+
+    @PostMapping("/revoke-reception-privilege/{email}")
+    public ResponseEntity<String> revokeReceptionPrivilege(@PathVariable("email") String email) {
+        return ResponseEntity.ok(userService.revokeReceptionPrivilege(email));
+    }
+
+
+    //Helper method to handle error messages
+    private ResponseEntity<Map<String, String>> buildErrorResponse(String message, HttpStatus status) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", message);
+        return ResponseEntity.status(status).body(errorResponse);
+    }
+}
 

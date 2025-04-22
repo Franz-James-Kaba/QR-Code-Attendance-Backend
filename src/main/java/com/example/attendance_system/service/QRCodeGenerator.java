@@ -15,6 +15,9 @@ import static com.google.zxing.BarcodeFormat.QR_CODE;
 public class QRCodeGenerator {
 
     public ByteArrayOutputStream generateQRCode(String sessionCode, int width, int height) throws WriterException, IOException {
+        if (width <= 0 || height <= 0)
+            throw new IllegalArgumentException("Width and height must be positive");
+
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
         BitMatrix bitMatrix = qrCodeWriter.encode(sessionCode, QR_CODE, width, height);
 

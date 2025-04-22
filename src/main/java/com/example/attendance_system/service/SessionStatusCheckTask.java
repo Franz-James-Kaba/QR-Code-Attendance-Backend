@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import java.time.LocalDateTime;
 
 @Component
@@ -25,7 +26,7 @@ public class SessionStatusCheckTask {
         this.repository = repository;
     }
 
-    @Scheduled(fixedRateString = "${check.rate}")
+    @Scheduled(fixedDelayString = "${check.rate}")
     @Transactional
     public void updateSessionStatuses() {
         try {
@@ -35,11 +36,10 @@ public class SessionStatusCheckTask {
             log.info("Session statuses updated successfully at {}", now);
         } catch (Exception e) {
             log.error("Failed to update session statuses", e);
-            throw new RuntimeException("Failed to update session statuses", e);
         }
     }
 
-    @Scheduled(fixedRateString = "${cleanup.rate}")
+    @Scheduled(fixedDelayString = "${cleanup.rate}")
     @Transactional
     public void cleanupExpiredSessions() {
         try {
@@ -49,7 +49,6 @@ public class SessionStatusCheckTask {
             log.info("Cleaned up {} expired sessions at {}", expiredCount, now);
         } catch (Exception e) {
             log.error("Failed to cleanup expired sessions", e);
-            throw new RuntimeException("Failed to cleanup expired sessions", e);
         }
     }
 }
