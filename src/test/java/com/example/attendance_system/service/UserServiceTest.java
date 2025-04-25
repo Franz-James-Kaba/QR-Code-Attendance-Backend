@@ -43,7 +43,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.attendance_system.role.Role.NSP;
+import static com.example.attendance_system.role.Role.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -84,6 +84,9 @@ class UserServiceTest {
     private String generatedPassword;
     private String encodedPassword;
     private RegisterRequest request;
+    private User facilitatorUser;
+    private User receptionUser;
+    private User nspUser;
 
     @BeforeEach
     void setUp() {
@@ -122,6 +125,24 @@ class UserServiceTest {
 
         generatedPassword = "TempPass123";
         encodedPassword = "EncodedPass123";
+
+        facilitatorUser = User.builder()
+                .id(1L)
+                .email("facilitator@example.com")
+                .role(FACILITATOR)
+                .build();
+
+        receptionUser = User.builder()
+                .id(1L)
+                .email("reception@example.com")
+                .role(RECEPTION)
+                .build();
+
+        nspUser = User.builder()
+                .id(3L)
+                .email("nsp@example.com")
+                .role(NSP)
+                .build();
     }
 
     @Test
@@ -548,5 +569,84 @@ class UserServiceTest {
         user.setRole(role);
         user.setEmail(role.name().toLowerCase() + "@example.com");
         return user;
+    }
+
+    @Test
+    void testGrantReceptionPrivilege_Success() {
+        when(userRepository.findByEmail(facilitatorUser.getEmail()))
+                .thenReturn(Optional.of(facilitatorUser));
+        when(userRepository.save(any(User.class))).thenReturn(facilitatorUser);
+
+        String result = userService.grantReceptionPrivilege(facilitatorUser.getEmail());
+
+        assertEquals("Reception privilege granted", result);
+        assertEquals(RECEPTION, facilitatorUser.getRole());
+        verify(userRepository).save(facilitatorUser);
+    }
+
+    // grantReceptionPrivilege: not facilitator
+    @Test
+    void testGrantReceptionPrivilege_NotFacilitator() {
+        when(userRepository.findByEmail(nspUser.getEmail()))
+                .thenReturn(Optional.of(nspUser));
+
+        String result = userService.grantReceptionPrivilege(nspUser.getEmail());
+
+        assertEquals("Only facilitators should be granted reception privilege", result);
+        assertEquals(Role.NSP, nspUser.getRole());
+        verify(userRepository, never()).save(any());
+    }
+
+    // grantReceptionPrivilege: user not found
+    @Test
+    void testGrantReceptionPrivilege_UserNotFound() {
+        when(userRepository.findByEmail("unknown@example.com"))
+                .thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(UserNotFoundException.class, () ->
+                userService.grantReceptionPrivilege("unknown@example.com"));
+
+        assertEquals("User not found", exception.getMessage());
+        verify(userRepository, never()).save(any());
+    }
+
+    // revokeReceptionPrivilege: success
+    @Test
+    void testRevokeReceptionPrivilege_Success() {
+        when(userRepository.findByEmail(receptionUser.getEmail()))
+                .thenReturn(Optional.of(receptionUser));
+        when(userRepository.save(any(User.class))).thenReturn(receptionUser);
+
+        String result = userService.revokeReceptionPrivilege(receptionUser.getEmail());
+
+        assertEquals("Reception privilege revoked", result);
+        assertEquals(FACILITATOR, receptionUser.getRole());
+        verify(userRepository).save(receptionUser);
+    }
+
+    // revokeReceptionPrivilege: not receptionist
+    @Test
+    void testRevokeReceptionPrivilege_NotReceptionist() {
+        when(userRepository.findByEmail(facilitatorUser.getEmail()))
+                .thenReturn(Optional.of(facilitatorUser));
+
+        String result = userService.revokeReceptionPrivilege(facilitatorUser.getEmail());
+
+        assertEquals("Only receptionists should have reception privilege revoked", result);
+        assertEquals(FACILITATOR, facilitatorUser.getRole());
+        verify(userRepository, never()).save(any());
+    }
+
+    // revokeReceptionPrivilege: user not found
+    @Test
+    void testRevokeReceptionPrivilege_UserNotFound() {
+        when(userRepository.findByEmail("unknown@example.com"))
+                .thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(UserNotFoundException.class, () ->
+                userService.revokeReceptionPrivilege("unknown@example.com"));
+
+        assertEquals("User not found", exception.getMessage());
+        verify(userRepository, never()).save(any());
     }
 }

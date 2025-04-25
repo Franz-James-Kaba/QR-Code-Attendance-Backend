@@ -3,7 +3,6 @@ package com.example.attendance_system.dto;
 import com.example.attendance_system.model.User;
 import com.example.attendance_system.role.Role;
 import lombok.Data;
-import java.util.UUID;
 
 @Data
 public class UserDTO {
