@@ -1,0 +1,28 @@
+package com.attendance_system.dto;
+
+import com.attendance_system.model.User;
+import com.attendance_system.role.Role;
+import lombok.Data;
+
+@Data
+public class UserDTO {
+    private Long id;
+    private String email;
+    private String firstName;
+    private String middleName;
+    private String lastName;
+    private Role role;
+
+    // Static method to convert User to UserDTO
+    public static UserDTO fromUser(User user) {
+        UserDTO dto = new UserDTO();
+        dto.setId(user.getId());
+        dto.setEmail(user.getEmail());
+        dto.setFirstName(user.getFirstName());
+        dto.setMiddleName(user.getMiddleName());
+        dto.setLastName(user.getLastName());
+        dto.setRole(user.getRole());
+        return dto;
+    }
+
+}
