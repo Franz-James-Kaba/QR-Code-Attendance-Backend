@@ -63,15 +63,14 @@ public class AttendanceService {
         var attendance = attendanceRepository.findByUserIdAndDate(userId, today)
                 .orElseThrow(() -> new ResourceNotFoundException("No check-in record found for today"));
 
-        LocalDateTime minCheckOutTime = attendance.getCheckInTime().plusHours(9);
-        if (LocalDateTime.now().isBefore(minCheckOutTime))
-            return "Cannot check out before minimum work period (8 hours)";
+        LocalTime minCheckOutTime = LocalTime.of(16, 30);
+        LocalDateTime minCheckOutDateTime = LocalDateTime.of(today, minCheckOutTime);
 
+        if (LocalDateTime.now().isBefore(minCheckOutDateTime)) {
+            return "Cannot check out before 4:30 PM";
+        }
 
-        attendance = Attendance.builder()
-                .checkOutTime(LocalDateTime.now())
-                .userId(userId)
-                .build();
+        attendance.setCheckOutTime(LocalDateTime.now());
         attendanceRepository.save(attendance);
         logAttendance(user.getEmail());
 

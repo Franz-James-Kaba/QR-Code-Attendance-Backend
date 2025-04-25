@@ -1,6 +1,5 @@
 package com.example.attendance_system.controller;
 
-import com.example.attendance_system.role.Role;
 import com.example.attendance_system.service.AttendanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

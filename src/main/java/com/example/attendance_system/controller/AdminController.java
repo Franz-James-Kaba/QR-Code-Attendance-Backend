@@ -5,11 +5,11 @@ import com.example.attendance_system.exceptions.AttendanceServiceException;
 import com.example.attendance_system.exceptions.UnauthorizedUserException;
 import com.example.attendance_system.exceptions.UserNotFoundException;
 import com.example.attendance_system.model.Attendance;
-import com.example.attendance_system.role.FacilitatorRole;
-import com.example.attendance_system.role.NSPRole;
+import com.example.attendance_system.model.User;
 import com.example.attendance_system.request.RegisterRequest;
 import com.example.attendance_system.request.UpdateUserRequest;
-import com.example.attendance_system.model.User;
+import com.example.attendance_system.role.FacilitatorRole;
+import com.example.attendance_system.role.NSPRole;
 import com.example.attendance_system.service.AttendanceService;
 import com.example.attendance_system.service.UserService;
 import jakarta.mail.MessagingException;
@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
