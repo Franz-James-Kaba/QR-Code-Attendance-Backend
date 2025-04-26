@@ -43,20 +43,20 @@ jobs:
 
           echo "Image pushed to ECR successfully."
 
-      - name: Download current task definition
-        id: download-task-def
-        run: |
-          aws ecs describe-task-definition \
-            --task-definition qrcode-task \
-            --query taskDefinition \
-            > task-def.json
-
-      - name: Update image in task definition
-        id: update-task-def
+      - name: Download and prepare task definition
+        id: prepare-task-def
         env:
           IMAGE_TAG: ${{ github.sha }}
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
+          # Get the task definition and remove read-only fields
+          aws ecs describe-task-definition \
+            --task-definition qrcode-task \
+            --query 'taskDefinition' \
+            | jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)' \
+            > task-def.json
+
+          # Update the image in the task definition
           IMAGE_URI="$ECR_REGISTRY/qrcode_repository:$IMAGE_TAG"
           echo "Updating task definition to use image: $IMAGE_URI"
           jq --arg IMAGE "$IMAGE_URI" '.containerDefinitions[0].image = $IMAGE' task-def.json > new-task-def.json
