@@ -494,7 +494,7 @@ Generates a QR code for an attendance session. This endpoint is protected and re
   "startTime": "2025-04-26T09:00:00",
   "endTime": "2025-04-26T17:00:00"
 }
-
+```
 
 ### Attendance Tracking
 
