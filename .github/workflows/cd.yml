@@ -1,4 +1,4 @@
-name: Deploy to ECR
+name: Deploy to ECR and ECS
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
       - testing
 
 jobs:
-  build:
-    name: Build and Push Docker Image
+  build-and-deploy:
+    name: Build, Push, and Deploy to ECS
     runs-on: ubuntu-latest
 
     steps:
@@ -30,7 +30,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: qrcode_repository
-          IMAGE_TAG: ${{github.sha}}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
           echo "Building Docker image..."
           docker build \
@@ -41,6 +41,38 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-          echo "Success! Image pushed to ECR:"
-          echo "  - Latest: $ECR_REGISTRY/$ECR_REPOSITORY:latest"
-          echo "  - Versioned: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          echo "Image pushed to ECR successfully."
+
+      - name: Download current task definition
+        id: download-task-def
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition qrcode-task \
+            --query taskDefinition \
+            > task-def.json
+
+      - name: Update image in task definition
+        id: update-task-def
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          IMAGE_URI="$ECR_REGISTRY/qrcode_repository:$IMAGE_TAG"
+          echo "Updating task definition to use image: $IMAGE_URI"
+          jq --arg IMAGE "$IMAGE_URI" '.containerDefinitions[0].image = $IMAGE' task-def.json > new-task-def.json
+
+      - name: Register new task definition
+        id: register-task-def
+        run: |
+          TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://new-task-def.json \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+          echo "TASK_DEF_ARN=$TASK_DEF_ARN" >> $GITHUB_ENV
+
+      - name: Update ECS service to use new task definition
+        run: |
+          aws ecs update-service \
+            --cluster qrcode-cluster \
+            --service qrcode-service \
+            --task-definition ${{ env.TASK_DEF_ARN }}
