@@ -39,12 +39,12 @@ public class AttendanceService {
 
         var user = getAuthenticatedUser();
         var today = LocalDate.now();
-        if (attendanceRepository.existsByDate(today))
+        if (attendanceRepository.existsByDateAndUser(today, user))
             return "Attendance already recorded for today";
 
         var attendance = Attendance.builder()
                 .checkInTime(LocalDateTime.now())
-                .userId(user.getId())
+                .user(user)
                 .date(LocalDate.now())
                 .build();
         attendanceRepository.save(attendance);
@@ -57,10 +57,9 @@ public class AttendanceService {
         validateSession(sessionCode);
 
         var user = getAuthenticatedUser();
-        var userId = user.getId();
         var today = LocalDate.now();
 
-        var attendance = attendanceRepository.findByUserIdAndDate(userId, today)
+        var attendance = attendanceRepository.findByUserAndDate(user, today)
                 .orElseThrow(() -> new ResourceNotFoundException("No check-in record found for today"));
 
         LocalTime minCheckOutTime = LocalTime.of(16, 30);
