@@ -5,7 +5,7 @@ import com.attendance_system.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
+import java.time.*;
 import java.time.LocalTime;
 
 @Service
@@ -40,6 +40,63 @@ public class MetricsService {
         return convertToLocalTime(avgSeconds);
     }
 
+    public LocalTime getAverageCheckInTimeForNSPS(LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null) {
+            throw new IllegalArgumentException("Both startDate and endDate must be provided");
+        }
+        validateDateRange(startDate, endDate);
+
+        Instant avgCheckInTime = attendanceRepository
+                .findAverageCheckInTimeByUserRoleAndDateRange("NSP", startDate, endDate);
+
+        return avgCheckInTime != null ?
+                avgCheckInTime.atZone(ZoneId.systemDefault()).toLocalTime() :
+                null;
+    }
+    public LocalTime getAverageCheckOutTimeForNSPS(LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null) {
+            throw new IllegalArgumentException("Both startDate and endDate must be provided");
+        }
+        validateDateRange(startDate, endDate);
+
+        Instant avgCheckInTime = attendanceRepository
+                .findAverageCheckOutTimeByUserRoleAndDateRange("NSP", startDate, endDate);
+
+        return avgCheckInTime != null ?
+                avgCheckInTime.atZone(ZoneId.systemDefault()).toLocalTime() :
+                null;
+    }
+
+
+    public LocalTime getAverageCheckInTimeForFacilitators(LocalDate startDate, LocalDate endDate){
+        if (startDate == null || endDate == null) {
+            throw new IllegalArgumentException("Both startDate and endDate must be provided");
+        }
+        validateDateRange(startDate, endDate);
+
+        Instant avgCheckInTime = attendanceRepository
+                .findAverageCheckInTimeByUserRoleAndDateRange("FACILITATOR", startDate, endDate);
+
+        return avgCheckInTime != null ?
+                avgCheckInTime.atZone(ZoneId.systemDefault()).toLocalTime() :
+                null;
+    }
+
+    public LocalTime getAverageCheckOutTimeForFacilitators(LocalDate startDate, LocalDate endDate){
+        if (startDate == null || endDate == null) {
+            throw new IllegalArgumentException("Both startDate and endDate must be provided");
+        }
+        validateDateRange(startDate, endDate);
+
+        Instant avgCheckInTime = attendanceRepository
+                .findAverageCheckOutTimeByUserRoleAndDateRange("FACILITATOR", startDate, endDate);
+
+        return avgCheckInTime != null ?
+                avgCheckInTime.atZone(ZoneId.systemDefault()).toLocalTime() :
+                null;
+    }
+
+
     private LocalTime convertToLocalTime(Double avgSeconds) {
         if (avgSeconds == null) return null;
 
@@ -51,6 +108,18 @@ public class MetricsService {
     }
 
 
+    private void validateDateRange(LocalDate startDate, LocalDate endDate) {
+        if (startDate == null) {
+            throw new IllegalArgumentException("Start date cannot be null");
+        }
 
+        if (endDate == null) {
+            throw new IllegalArgumentException("End date cannot be null");
+        }
+
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("Start date cannot be after end date");
+        }
+    }
 
 }

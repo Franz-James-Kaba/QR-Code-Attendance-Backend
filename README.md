@@ -567,3 +567,157 @@ For validation errors, the response will include specific error messages for eac
 - Admin operations require specific admin privileges.
 
 
+### NSP Average Check-In Time
+
+Retrieves the average check-in time for NSPs within a specified date range.
+
+```
+GET /average-check-in-time-nsp
+```
+
+#### Request Parameters
+
+| Parameter | Type | Required | Format | Description |
+|-----------|------|----------|--------|-------------|
+| startDate | Date | Yes | ISO Date (YYYY-MM-DD) | The start date of the date range |
+| endDate | Date | Yes | ISO Date (YYYY-MM-DD) | The end date of the date range |
+
+#### Responses
+
+| Status Code | Description | Response Type |
+|-------------|-------------|---------------|
+| 200 | Success | LocalTime (ISO Time format) |
+| 204 | No Content (No data available for the specified date range) | Empty |
+| 400 | Bad Request (Invalid parameters) | Error message |
+
+#### Example Request
+
+```
+GET /average-check-in-time-nsp?startDate=2025-04-01&endDate=2025-04-28
+```
+
+#### Example Response
+
+```
+"08:45:30"
+```
+
+### NSP Average Check-Out Time
+
+Retrieves the average check-out time for NSPs within a specified date range.
+
+```
+GET /average-check-out-time-nsp
+```
+
+#### Request Parameters
+
+| Parameter | Type | Required | Format | Description |
+|-----------|------|----------|--------|-------------|
+| startDate | Date | Yes | ISO Date (YYYY-MM-DD) | The start date of the date range |
+| endDate | Date | Yes | ISO Date (YYYY-MM-DD) | The end date of the date range |
+
+#### Responses
+
+| Status Code | Description | Response Type |
+|-------------|-------------|---------------|
+| 200 | Success | LocalTime (ISO Time format) |
+| 204 | No Content (No data available for the specified date range) | Empty |
+| 400 | Bad Request (Invalid parameters) | Error message |
+
+#### Example Request
+
+```
+GET /average-check-out-time-nsp?startDate=2025-04-01&endDate=2025-04-28
+```
+
+#### Example Response
+
+```
+"17:15:45"
+```
+
+### Facilitator Average Check-In Time
+
+Retrieves the average check-in time for Facilitators within a specified date range.
+
+```
+GET /average-check-in-time-facilitator
+```
+
+#### Request Parameters
+
+| Parameter | Type | Required | Format | Description |
+|-----------|------|----------|--------|-------------|
+| startDate | Date | Yes | ISO Date (YYYY-MM-DD) | The start date of the date range |
+| endDate | Date | Yes | ISO Date (YYYY-MM-DD) | The end date of the date range |
+
+#### Responses
+
+| Status Code | Description | Response Type |
+|-------------|-------------|---------------|
+| 200 | Success | LocalTime (ISO Time format) |
+| 204 | No Content (No data available for the specified date range) | Empty |
+| 400 | Bad Request (Invalid parameters) | Error message |
+
+#### Example Request
+
+```
+GET /average-check-in-time-facilitator?startDate=2025-04-01&endDate=2025-04-28
+```
+
+#### Example Response
+
+```
+"09:00:15"
+```
+
+### Facilitator Average Check-Out Time
+
+Retrieves the average check-out time for Facilitators within a specified date range.
+
+```
+GET /average-check-out-time-facilitator
+```
+
+#### Request Parameters
+
+| Parameter | Type | Required | Format                | Description                      |
+|-----------|------|----------|-----------------------|----------------------------------|
+| startDate | Date | Yes      | ISO Date (YYYY-MM-DD) | The start date of the date range |
+| endDate   | Date | Yes      | ISO Date (YYYY-MM-DD) | The end date of the date range   |
+
+#### Responses
+
+| Status Code | Description                                                 | Response Type               |
+|-------------|-------------------------------------------------------------|-----------------------------|
+| 200         | Success                                                     | LocalTime (ISO Time format) |
+| 204         | No Content (No data available for the specified date range) | Empty                       |
+| 400         | Bad Request (Invalid parameters)                            | Error message               |
+
+#### Example Request
+
+```
+GET /average-check-out-time-facilitator?startDate=2025-04-01&endDate=2025-04-28
+```
+
+#### Example Response
+
+```
+"16:45:20"
+```
+
+## Error Handling
+
+All endpoints follow the same error handling pattern:
+
+- If the date parameters are invalid (e.g., endDate before startDate), a 400 Bad Request response is returned with an appropriate error message.
+- If no data is available for the specified date range, a 204 No Content response is returned.
+- Internal server errors will result in a 500 Internal Server Error response.
+
+## Implementation Notes
+
+- All time values are returned as ISO-formatted time strings (HH:MM:SS).
+- Date parameters must be provided in ISO date format (YYYY-MM-DD).
+- The date range is inclusive of both the start and end dates.
+- Time calculations are handled by the underlying metricsService.
