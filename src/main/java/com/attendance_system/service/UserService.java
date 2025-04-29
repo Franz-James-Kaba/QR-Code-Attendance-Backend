@@ -80,7 +80,10 @@ public class UserService {
 
             var user = (User) authentication.getPrincipal();
             var token = jwtService.generateToken(user.getUsername());
-            return AuthenticationResponse.builder()
+
+            return user.isPasswordResetRequired() ? AuthenticationResponse.builder()
+                        .passwordResetRequired(user.isPasswordResetRequired())
+                        .build() : AuthenticationResponse.builder()
                     .token(token)
                     .passwordResetRequired(user.isPasswordResetRequired())
                     .role(user.getRole().name())
