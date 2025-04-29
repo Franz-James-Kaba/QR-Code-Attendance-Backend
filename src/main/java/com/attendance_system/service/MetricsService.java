@@ -5,8 +5,8 @@ import com.attendance_system.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
 import java.time.*;
+import java.time.LocalTime;
 
 @Service
 @RequiredArgsConstructor
@@ -17,7 +17,7 @@ public class MetricsService {
 
     public LocalTime getAverageCheckInTime() {
         var email = SecurityContextHolder.getContext().getAuthentication().getName();
-        var user = userRepository.findByEmail(email)
+        var user =  userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return getAverageCheckInTime(user.getId());
 
@@ -25,7 +25,7 @@ public class MetricsService {
 
     public LocalTime getAverageCheckOutTime() {
         var email = SecurityContextHolder.getContext().getAuthentication().getName();
-        var user = userRepository.findByEmail(email)
+        var user =  userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return getAverageCheckOutTime(user.getId());
     }
@@ -96,6 +96,7 @@ public class MetricsService {
                 null;
     }
 
+
     private LocalTime convertToLocalTime(Double avgSeconds) {
         if (avgSeconds == null) return null;
 
@@ -105,6 +106,7 @@ public class MetricsService {
 
         return LocalTime.of(hours, minutes, seconds);
     }
+
 
     private void validateDateRange(LocalDate startDate, LocalDate endDate) {
         if (startDate == null) {
@@ -119,4 +121,5 @@ public class MetricsService {
             throw new IllegalArgumentException("Start date cannot be after end date");
         }
     }
+
 }

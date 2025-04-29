@@ -34,7 +34,6 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
             "AVG(EXTRACT(HOUR FROM check_out_time) * 3600 + EXTRACT(MINUTE FROM check_out_time) * 60 + EXTRACT(SECOND FROM check_out_time)) AS avg_seconds " +
             "FROM attendance WHERE user_id = :userId AND check_out_time IS NOT NULL", nativeQuery = true)
     Double findAverageCheckOutTimeInSecondsByUserId(@Param("userId") Long userId);
-
     @Query(value = """
     SELECT to_timestamp(AVG(EXTRACT(EPOCH FROM CAST(a.check_in_time AS TIME))))
     FROM attendance a
@@ -60,6 +59,4 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
-
-
 }
