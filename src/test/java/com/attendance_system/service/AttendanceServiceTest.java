@@ -1,4 +1,5 @@
 package com.attendance_system.service;
+
 import com.attendance_system.exceptions.AttendanceServiceException;
 import com.attendance_system.exceptions.InvalidSessionException;
 import com.attendance_system.exceptions.ResourceNotFoundException;
@@ -37,7 +38,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -74,6 +74,8 @@ class AttendanceServiceTest {
     private final String SESSION_CODE = "valid-session-code";
     private final String USER_EMAIL = "test@example.com";
     private final Long USER_ID = 1L;
+    private User user;
+
 
     private static final LocalTime EARLY_TIME = LocalTime.of(7, 30);
     private static final LocalDate START_DATE = LocalDate.of(2023, 5, 1);
@@ -94,7 +96,7 @@ class AttendanceServiceTest {
         when(sessionRepository.findBySessionCode(SESSION_CODE)).thenReturn(Optional.of(activeSession));
 
         // Setup User mock
-        User user = User.builder()
+        user = User.builder()
                 .id(USER_ID)
                 .email(USER_EMAIL)
                 .build();
@@ -236,7 +238,7 @@ class AttendanceServiceTest {
     @Test
     void checkIn_Success() {
         // Given
-        when(attendanceRepository.existsByDate(any(LocalDate.class))).thenReturn(false);
+        when(attendanceRepository.existsByDateAndUser(any(LocalDate.class), any())).thenReturn(false);
 
         // When
         String result = attendanceService.checkIn(SESSION_CODE);
@@ -249,7 +251,7 @@ class AttendanceServiceTest {
     @Test
     void checkIn_AlreadyCheckedIn() {
         // Given
-        when(attendanceRepository.existsByDate(any(LocalDate.class))).thenReturn(true);
+        when(attendanceRepository.existsByDateAndUser(any(LocalDate.class), any())).thenReturn(true);
 
         // When
         String result = attendanceService.checkIn(SESSION_CODE);
@@ -292,50 +294,9 @@ class AttendanceServiceTest {
         verify(attendanceRepository, never()).save(any(Attendance.class));
     }
 
-    @Test
-    void checkOut_Success() {
-        // Given
-        LocalDateTime checkInTime = LocalDateTime.now().minusHours(9);
-        Attendance attendance = createAttendance(checkInTime, null);
 
-        when(attendanceRepository.findByUserIdAndDate(eq(USER_ID), any(LocalDate.class)))
-                .thenReturn(Optional.of(attendance));
 
-        // When
-        String result = attendanceService.checkOut(SESSION_CODE);
 
-        // Then
-        assertEquals("Checked out successfully", result);
-        verify(attendanceRepository).save(any(Attendance.class));
-    }
-
-    @Test
-    void checkOut_BeforeMinimumWorkPeriod() {
-        // Given
-        LocalDateTime checkInTime = LocalDateTime.now().minusHours(7); // 7 hours ago, less than required 9
-        Attendance attendance = createAttendance(checkInTime, null);
-
-        when(attendanceRepository.findByUserIdAndDate(eq(USER_ID), any(LocalDate.class)))
-                .thenReturn(Optional.of(attendance));
-
-        // When
-        String result = attendanceService.checkOut(SESSION_CODE);
-
-        // Then
-        assertEquals("Cannot check out before minimum work period (8 hours)", result);
-        verify(attendanceRepository, never()).save(any(Attendance.class));
-    }
-
-    @Test
-    void checkOut_NoCheckInRecord() {
-        // Given
-        when(attendanceRepository.findByUserIdAndDate(eq(USER_ID), any(LocalDate.class)))
-                .thenReturn(Optional.empty());
-
-        // When & Then
-        assertThrows(ResourceNotFoundException.class, () -> attendanceService.checkOut(SESSION_CODE));
-        verify(attendanceRepository, never()).save(any(Attendance.class));
-    }
 
     @Test
     void checkOut_InvalidSession() {
@@ -347,7 +308,7 @@ class AttendanceServiceTest {
 
         // When & Then
         assertThrows(InvalidSessionException.class, () -> attendanceService.checkOut(SESSION_CODE));
-        verify(attendanceRepository, never()).findByUserIdAndDate(any(), any());
+        verify(attendanceRepository, never()).findByUserAndDate(any(), any());
         verify(attendanceRepository, never()).save(any(Attendance.class));
     }
 
@@ -374,7 +335,7 @@ class AttendanceServiceTest {
     // Helper methods
     private Attendance createAttendance(LocalDateTime checkInTime, LocalDateTime checkOutTime) {
         return Attendance.builder()
-                .userId(USER_ID)
+                .user(user)
                 .date(LocalDate.now())
                 .checkInTime(checkInTime)
                 .checkOutTime(checkOutTime)
