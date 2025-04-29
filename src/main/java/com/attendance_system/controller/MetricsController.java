@@ -12,7 +12,7 @@ import java.time.LocalTime;
 
 @RestController
 @RequestMapping("/api/nsp")
-@PreAuthorize("hasAnyRole('FACILITATOR', 'NSP')")
+@PreAuthorize("hasAnyRole('FACILITATOR', 'NSP', 'ADMIN')")
 @RequiredArgsConstructor
 public class MetricsController {
     private final MetricsService metricsService;
