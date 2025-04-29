@@ -10,7 +10,9 @@ import com.attendance_system.request.RegisterRequest;
 import com.attendance_system.request.UpdateUserRequest;
 import com.attendance_system.role.FacilitatorRole;
 import com.attendance_system.role.NSPRole;
+import com.attendance_system.role.Role;
 import com.attendance_system.service.AttendanceService;
+import com.attendance_system.service.MetricsService;
 import com.attendance_system.service.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,6 +43,7 @@ import java.util.Map;
 public class AdminController {
     private final UserService userService;
     private final AttendanceService attendanceService;
+    private final MetricsService metricsService;
 
     @PostMapping("/create-nsp")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) throws MessagingException {
@@ -161,6 +165,72 @@ public class AdminController {
     public ResponseEntity<String> revokeReceptionPrivilege(@PathVariable("email") String email) {
         return ResponseEntity.ok(userService.revokeReceptionPrivilege(email));
     }
+
+    //average check in time for nsps
+    @GetMapping("/average-check-in-time-nsp")
+    public ResponseEntity<?> getAverageCheckInTimeForNSPS(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        try {
+            LocalTime averageTime = metricsService.getAverageCheckInTimeForNSPS(startDate, endDate);
+            return averageTime != null ?
+                    ResponseEntity.ok(averageTime) :
+                    ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    //average check out time for nsps
+    @GetMapping("/average-check-out-time-nsp")
+    public ResponseEntity<?> getAverageCheckOutTimeForNSPS(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        try {
+            LocalTime averageTime = metricsService.getAverageCheckOutTimeForNSPS(startDate, endDate);
+            return averageTime != null ?
+                    ResponseEntity.ok(averageTime) :
+                    ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    //get the average check in time for facilitators
+    @GetMapping("/average-check-in-time-facilitator")
+    public ResponseEntity<?> getAverageCheckInTimeForFacilitators(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        try {
+            LocalTime averageTime = metricsService.getAverageCheckInTimeForFacilitators(startDate, endDate);
+            return averageTime != null ?
+                    ResponseEntity.ok(averageTime) :
+                    ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    //get the average check out time for facilitators
+    @GetMapping("/average-check-out-time-facilitator")
+    public ResponseEntity<?> getAverageCheckOutTimeForFacilitators(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        try {
+            LocalTime averageTime = metricsService.getAverageCheckOutTimeForFacilitators(startDate, endDate);
+            return averageTime != null ?
+                    ResponseEntity.ok(averageTime) :
+                    ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
 
 
     //Helper method to handle error messages
