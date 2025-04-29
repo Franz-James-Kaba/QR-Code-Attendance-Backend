@@ -16,6 +16,7 @@ import java.util.UUID;
 public class SessionService {
     private final SessionRepository repository;
     private final QRCodeGenerator qrCodeGenerator;
+    private final SessionSchedulerService sessionSchedulerService;
 
     public byte[] generateQRCode(GenerateSessionRequest request, int width, int height) throws IOException, WriterException {
         var sessionCode = UUID.randomUUID().toString();
@@ -27,8 +28,10 @@ public class SessionService {
                 .startTime(request.startTime())
                 .endTime(request.endTime())
                 .build();
-        repository.save(session);
 
+        repository.save(session);
+        sessionSchedulerService.scheduleSessionActivation(session);
+        sessionSchedulerService.scheduleSessionInvalidation(session);
         return qrcode.toByteArray();
 
     }

@@ -81,13 +81,15 @@ public class UserService {
             var user = (User) authentication.getPrincipal();
             var token = jwtService.generateToken(user.getUsername());
 
-            return user.isPasswordResetRequired() ? AuthenticationResponse.builder()
-                        .passwordResetRequired(user.isPasswordResetRequired())
-                        .build() : AuthenticationResponse.builder()
-                    .token(token)
-                    .passwordResetRequired(user.isPasswordResetRequired())
-                    .role(user.getRole().name())
-                    .build();
+            return user.isPasswordResetRequired() ?
+                    AuthenticationResponse.builder()
+                            .passwordResetRequired(user.isPasswordResetRequired())
+                            .build() :
+                    AuthenticationResponse.builder()
+                            .token(token)
+                            .passwordResetRequired(user.isPasswordResetRequired())
+                            .role(user.getRole().name())
+                            .build();
 
         } catch (AuthenticationException ex) {
             throw new BadCredentialsException("Invalid username or password");
