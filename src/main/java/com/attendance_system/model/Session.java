@@ -21,6 +21,8 @@ public class Session {
     @GeneratedValue
     private Integer id;
 
+    private String name;
+
     @Column(unique = true, nullable = false)
     private String sessionCode;
 

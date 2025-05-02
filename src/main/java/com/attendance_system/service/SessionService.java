@@ -25,6 +25,7 @@ public class SessionService {
 
         var session = Session.builder()
                 .sessionCode(sessionCode)
+                .name(request.name())
                 .active(LocalDateTime.now().isAfter(request.startTime()) || LocalDateTime.now().isEqual(request.startTime()))
                 .startTime(request.startTime())
                 .endTime(request.endTime())
