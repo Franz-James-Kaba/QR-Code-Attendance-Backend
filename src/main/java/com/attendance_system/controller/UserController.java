@@ -4,6 +4,7 @@ import com.attendance_system.request.AuthenticationRequest;
 import com.attendance_system.request.RegisterRequest;
 import com.attendance_system.request.ResetPasswordRequest;
 import com.attendance_system.response.AuthenticationResponse;
+import com.attendance_system.response.SuccessResponse;
 import com.attendance_system.role.AdminRole;
 import com.attendance_system.service.UserService;
 import jakarta.mail.MessagingException;
@@ -25,7 +26,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/create-admin")
-    public ResponseEntity<String> createAdmin(@RequestBody @Valid RegisterRequest request) throws MessagingException {
+    public ResponseEntity<SuccessResponse> createAdmin(@RequestBody @Valid RegisterRequest request) throws MessagingException {
         return ResponseEntity.ok(userService.createUser(request, new AdminRole()));
     }
 
@@ -35,17 +36,17 @@ public class UserController {
     }
 
     @PostMapping("/reset-password-request")
-    public ResponseEntity<String> resetPassword(@RequestParam @Email String email) throws MessagingException {
+    public ResponseEntity<SuccessResponse> resetPassword(@RequestParam @Email String email) throws MessagingException {
         return ResponseEntity.ok(userService.resetPasswordRequest(email));
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestParam @Email String email, @RequestParam String token, @Valid @RequestBody ResetPasswordRequest request) {
+    public ResponseEntity<SuccessResponse> resetPassword(@RequestParam @Email String email, @RequestParam String token, @Valid @RequestBody ResetPasswordRequest request) {
         return ResponseEntity.ok(userService.resetPassword(token, email, request));
     }
 
     @PostMapping("/first-password-reset")
-    public ResponseEntity<String> firstPasswordReset(
+    public ResponseEntity<SuccessResponse> firstPasswordReset(
             @RequestParam @Email String email,
             @Valid @RequestBody ResetPasswordRequest request,
             BindingResult bindingResult
@@ -55,7 +56,12 @@ public class UserController {
                     .stream()
                     .map(FieldError::getDefaultMessage)
                     .collect(Collectors.joining(", "));
-            return ResponseEntity.badRequest().body(errorMessage);
+            return ResponseEntity.badRequest().body(
+                    SuccessResponse.builder()
+                            .success(false)
+                            .message(errorMessage)
+                            .build()
+            );
         }
 
         return ResponseEntity.ok(userService.firstPasswordReset(email, request));

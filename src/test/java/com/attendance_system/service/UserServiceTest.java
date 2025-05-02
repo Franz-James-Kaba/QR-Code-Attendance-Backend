@@ -155,7 +155,7 @@ class UserServiceTest {
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
 
         // Act
-        String result = userService.createUser(request, new NSPRole());
+        var result = userService.createUser(request, new NSPRole());
 
         // Assert
         // Verify the user is saved and capture the actual User object
@@ -170,7 +170,7 @@ class UserServiceTest {
         );
 
         // Assert that the method returns the correct message
-        assertEquals("User created successfully", result);
+        assertEquals("User created successfully", result.getMessage());
 
         // Assert the saved user's role is correct
         assertEquals(NSP, savedUser.getRole());
@@ -188,7 +188,7 @@ class UserServiceTest {
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
 
         // Act
-        String result = userService.createUser(request, new FacilitatorRole());
+        var result = userService.createUser(request, new FacilitatorRole());
 
         // Assert
         // Verify the user is saved and capture the actual User object
@@ -203,7 +203,7 @@ class UserServiceTest {
         );
 
         // Assert that the method returns the correct message
-        assertEquals("User created successfully", result);
+        assertEquals("User created successfully", result.getMessage());
 
         // Assert the saved user's role is correct
         assertEquals(Role.FACILITATOR, savedUser.getRole());
@@ -220,7 +220,7 @@ class UserServiceTest {
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
 
         // Act
-        String result = userService.createUser(request, new AdminRole());
+        var result = userService.createUser(request, new AdminRole());
 
         // Assert
         // Verify the user is saved and capture the actual User object
@@ -235,7 +235,7 @@ class UserServiceTest {
         );
 
         // Assert that the method returns the correct message
-        assertEquals("User created successfully", result);
+        assertEquals("User created successfully", result.getMessage());
 
         // Assert the saved user's role is correct
         assertEquals(Role.ADMIN, savedUser.getRole());
@@ -251,13 +251,13 @@ class UserServiceTest {
         when(passwordEncoder.encode(resetPasswordRequest.getPassword())).thenReturn("encodedPassword");
 
         // Act
-        String result = userService.resetPassword("validToken", user.getEmail(), resetPasswordRequest);
+        var result = userService.resetPassword("validToken", user.getEmail(), resetPasswordRequest);
 
         // Assert
         verify(userRepository, times(1)).save(user);
         verify(tokenRepository, times(1)).delete(token);
         assertEquals("encodedPassword", user.getPassword());
-        assertEquals("Password reset successful", result);
+        assertEquals("Password reset successful", result.getMessage());
     }
 
 
@@ -269,13 +269,13 @@ class UserServiceTest {
         when(passwordEncoder.encode(resetPasswordRequest.getPassword())).thenReturn("encodedPassword");
 
         // Act
-        String result = userService.firstPasswordReset(user.getEmail(), resetPasswordRequest);
+        var result = userService.firstPasswordReset(user.getEmail(), resetPasswordRequest);
 
         // Assert
         verify(userRepository, times(1)).save(user);
         assertFalse(user.isPasswordResetRequired());
         assertEquals("encodedPassword", user.getPassword());
-        assertEquals("Password reset successful", result);
+        assertEquals("Password reset successful", result.getMessage());
     }
 
     // ✅ TEST: updateUser()
@@ -403,7 +403,7 @@ class UserServiceTest {
                 eq("generated-token-123")
         );
 
-        String result = userService.resetPasswordRequest(email);
+        var result = userService.resetPasswordRequest(email);
 
         assertEquals("Password reset code sent to your email address", result);
         verify(tokenService, times(1)).generateAndSaveToken(user);
@@ -577,9 +577,9 @@ class UserServiceTest {
                 .thenReturn(Optional.of(facilitatorUser));
         when(userRepository.save(any(User.class))).thenReturn(facilitatorUser);
 
-        String result = userService.grantReceptionPrivilege(facilitatorUser.getEmail());
+        var result = userService.grantReceptionPrivilege(facilitatorUser.getEmail());
 
-        assertEquals("Reception privilege granted", result);
+        assertEquals("Reception privilege granted", result.getMessage());
         assertEquals(RECEPTION, facilitatorUser.getRole());
         verify(userRepository).save(facilitatorUser);
     }
@@ -590,9 +590,9 @@ class UserServiceTest {
         when(userRepository.findByEmail(nspUser.getEmail()))
                 .thenReturn(Optional.of(nspUser));
 
-        String result = userService.grantReceptionPrivilege(nspUser.getEmail());
+        var result = userService.grantReceptionPrivilege(nspUser.getEmail());
 
-        assertEquals("Only facilitators should be granted reception privilege", result);
+        assertEquals("Only facilitators should be granted reception privilege", result.getMessage());
         assertEquals(Role.NSP, nspUser.getRole());
         verify(userRepository, never()).save(any());
     }
@@ -617,9 +617,9 @@ class UserServiceTest {
                 .thenReturn(Optional.of(receptionUser));
         when(userRepository.save(any(User.class))).thenReturn(receptionUser);
 
-        String result = userService.revokeReceptionPrivilege(receptionUser.getEmail());
+        var result = userService.revokeReceptionPrivilege(receptionUser.getEmail());
 
-        assertEquals("Reception privilege revoked", result);
+        assertEquals("Reception privilege revoked", result.getMessage());
         assertEquals(FACILITATOR, receptionUser.getRole());
         verify(userRepository).save(receptionUser);
     }
@@ -630,9 +630,9 @@ class UserServiceTest {
         when(userRepository.findByEmail(facilitatorUser.getEmail()))
                 .thenReturn(Optional.of(facilitatorUser));
 
-        String result = userService.revokeReceptionPrivilege(facilitatorUser.getEmail());
+        var result = userService.revokeReceptionPrivilege(facilitatorUser.getEmail());
 
-        assertEquals("Only receptionists should have reception privilege revoked", result);
+        assertEquals("Only receptionists should have reception privilege revoked", result.getMessage());
         assertEquals(FACILITATOR, facilitatorUser.getRole());
         verify(userRepository, never()).save(any());
     }

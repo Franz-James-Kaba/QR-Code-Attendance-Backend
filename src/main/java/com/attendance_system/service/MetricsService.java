@@ -2,6 +2,7 @@ package com.attendance_system.service;
 
 import com.attendance_system.repository.AttendanceRepository;
 import com.attendance_system.repository.UserRepository;
+import com.attendance_system.response.MetricsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -15,19 +16,25 @@ public class MetricsService {
     private final UserRepository userRepository;
 
 
-    public LocalTime getAverageCheckInTime() {
+    public MetricsResponse getAverageCheckInTime() {
         var email = SecurityContextHolder.getContext().getAuthentication().getName();
         var user =  userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return getAverageCheckInTime(user.getId());
+        return MetricsResponse.builder()
+                .message("Average check-in time retrieved for user: " + user.getEmail())
+                .data(getAverageCheckInTime(user.getId()))
+                .build();
 
     }
 
-    public LocalTime getAverageCheckOutTime() {
+    public MetricsResponse getAverageCheckOutTime() {
         var email = SecurityContextHolder.getContext().getAuthentication().getName();
         var user =  userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return getAverageCheckOutTime(user.getId());
+        return MetricsResponse.builder()
+                .message("Average check-out time retrieved for user: " + user.getEmail())
+                .data(getAverageCheckOutTime(user.getId()))
+                .build();
     }
 
     private LocalTime getAverageCheckInTime(Long userId) {

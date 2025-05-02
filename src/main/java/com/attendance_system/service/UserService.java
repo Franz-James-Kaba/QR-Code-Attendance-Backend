@@ -15,6 +15,7 @@ import com.attendance_system.request.RegisterRequest;
 import com.attendance_system.request.ResetPasswordRequest;
 import com.attendance_system.request.UpdateUserRequest;
 import com.attendance_system.response.AuthenticationResponse;
+import com.attendance_system.response.SuccessResponse;
 import com.attendance_system.role.Role;
 import com.attendance_system.role.Roles;
 import jakarta.mail.MessagingException;
@@ -48,7 +49,7 @@ public class UserService {
 
 
 
-    public String createUser(RegisterRequest request, Roles role) throws MessagingException {
+    public SuccessResponse createUser(RegisterRequest request, Roles role) throws MessagingException {
         String password = passwordGenerator.generatePassword(12);
 
         var user = User.builder()
@@ -66,7 +67,10 @@ public class UserService {
                  user.getFirstName(),
                  password
          );
-        return "User created successfully";
+        return SuccessResponse.builder()
+                .message("User created successfully")
+                .success(true)
+                .build();
     }
 
     public AuthenticationResponse login(AuthenticationRequest request) {
@@ -96,7 +100,7 @@ public class UserService {
         }
     }
 
-    public String resetPassword(String token, String email, ResetPasswordRequest request) {
+    public SuccessResponse resetPassword(String token, String email, ResetPasswordRequest request) {
         var savedToken = tokenRepository.findByToken(token)
                 .orElseThrow(() -> new ResourceNotFoundException("Token does not exist"));
 
@@ -107,24 +111,33 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
         tokenRepository.delete(savedToken);
-        return "Password reset successful";
+        return SuccessResponse.builder()
+                .message("Password reset successful")
+                .success(true)
+                .build();
     }
 
-    public String resetPasswordRequest(String email) throws MessagingException {
+    public SuccessResponse resetPasswordRequest(String email) throws MessagingException {
         var user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         sendPasswordResetMail(user);
-        return "Password reset code sent to your email address";
+        return SuccessResponse.builder()
+                .message("Password reset code sent to your email address")
+                .success(true)
+                .build();
     }
 
-    public String firstPasswordReset(String email, ResetPasswordRequest request) {
+    public SuccessResponse firstPasswordReset(String email, ResetPasswordRequest request) {
         var user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
 
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setPasswordResetRequired(false);
         userRepository.save(user);
-        return "Password reset successful";
+        return SuccessResponse.builder()
+                .message("Password reset successful")
+                .success(true)
+                .build();
     }
 
     private void sendPasswordResetMail(User user) throws MessagingException {
@@ -165,29 +178,41 @@ public class UserService {
     }
 
     @Transactional
-    public String grantReceptionPrivilege(String email) {
+    public SuccessResponse grantReceptionPrivilege(String email) {
         var user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         if (!user.getRole().equals(FACILITATOR))
-            return "Only facilitators should be granted reception privilege";
+            return SuccessResponse.builder()
+                    .success(false)
+                    .message("Only facilitators should be granted reception privilege")
+                    .build();
 
         user.setRole(RECEPTION);
         userRepository.save(user);
-        return "Reception privilege granted";
+        return SuccessResponse.builder()
+                .success(true)
+                .message("Reception privilege granted")
+                .build();
     }
 
     @Transactional
-    public String revokeReceptionPrivilege(String email) {
+    public SuccessResponse revokeReceptionPrivilege(String email) {
         var user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         if (!user.getRole().equals(RECEPTION))
-            return "Only receptionists should have reception privilege revoked";
+            return SuccessResponse.builder()
+                    .success(false)
+                    .message("Only receptionists should have reception privilege revoked")
+                    .build();
 
         user.setRole(FACILITATOR);
         userRepository.save(user);
-        return "Reception privilege revoked";
+        return SuccessResponse.builder()
+                .success(true)
+                .message("Reception privilege revoked")
+                .build();
     }
 
     //getting a facilitator

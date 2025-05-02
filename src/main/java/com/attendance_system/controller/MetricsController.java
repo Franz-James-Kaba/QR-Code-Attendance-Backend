@@ -1,5 +1,6 @@
 package com.attendance_system.controller;
 
+import com.attendance_system.response.MetricsResponse;
 import com.attendance_system.service.MetricsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +19,12 @@ public class MetricsController {
     private final MetricsService metricsService;
 
     @GetMapping("/average-check-in-time")
-    public ResponseEntity<LocalTime> getAverageCheckInTime() {
+    public ResponseEntity<MetricsResponse> getAverageCheckInTime() {
         return ResponseEntity.ok(metricsService.getAverageCheckInTime());
     }
 
     @GetMapping("/average-check-out-time")
-    public ResponseEntity<LocalTime> getAverageCheckOutTime() {
+    public ResponseEntity<MetricsResponse> getAverageCheckOutTime() {
         return ResponseEntity.ok(metricsService.getAverageCheckOutTime());
     }
 }
