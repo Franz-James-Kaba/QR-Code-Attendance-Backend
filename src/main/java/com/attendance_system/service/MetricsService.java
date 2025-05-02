@@ -3,6 +3,7 @@ package com.attendance_system.service;
 import com.attendance_system.repository.AttendanceRepository;
 import com.attendance_system.repository.UserRepository;
 import com.attendance_system.response.MetricsResponse;
+import com.attendance_system.response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -103,6 +104,21 @@ public class MetricsService {
                 null;
     }
 
+    public UserResponse getUserProfile() {
+        var email = SecurityContextHolder.getContext().getAuthentication().getName();
+        var user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        var fullName = user.getMiddleName().isEmpty() ?
+                user.getFirstName() + " " + user.getLastName() :
+                user.getFirstName() + " " + user.getMiddleName() + " " + user.getLastName();
+
+        return UserResponse.builder()
+                .fullName(fullName)
+                .role(user.getRole())
+                .build();
+    }
+
 
     private LocalTime convertToLocalTime(Double avgSeconds) {
         if (avgSeconds == null) return null;
@@ -128,5 +144,4 @@ public class MetricsService {
             throw new IllegalArgumentException("Start date cannot be after end date");
         }
     }
-
 }

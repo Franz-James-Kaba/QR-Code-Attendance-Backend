@@ -1,6 +1,7 @@
 package com.attendance_system.controller;
 
 import com.attendance_system.response.MetricsResponse;
+import com.attendance_system.response.UserResponse;
 import com.attendance_system.service.MetricsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -15,7 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @RestController
-@RequestMapping("/api/nsp")
+@RequestMapping("/api/metrics")
 @PreAuthorize("hasAnyRole('FACILITATOR', 'NSP', 'ADMIN')")
 @RequiredArgsConstructor
 public class MetricsController {
@@ -36,4 +37,10 @@ public class MetricsController {
     ) {
         return ResponseEntity.ok(metricsService.getAverageCheckOutTime(startDate, endDate));
     }
+
+    @GetMapping("/user-info")
+    public ResponseEntity<UserResponse> getUserProfile() {
+        return ResponseEntity.ok(metricsService.getUserProfile());
+    }
+
 }
