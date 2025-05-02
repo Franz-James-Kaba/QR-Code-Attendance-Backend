@@ -75,6 +75,9 @@ public class SessionService {
             session.setEndTime(request.endTime());
 
         repository.save(session);
+        sessionSchedulerService.scheduleSessionActivation(session);
+        sessionSchedulerService.scheduleSessionInvalidation(session);
+
         return SuccessResponse.builder()
                 .success(true)
                 .message("Session updated successfully")

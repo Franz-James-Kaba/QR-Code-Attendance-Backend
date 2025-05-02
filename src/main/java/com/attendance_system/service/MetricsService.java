@@ -16,34 +16,34 @@ public class MetricsService {
     private final UserRepository userRepository;
 
 
-    public MetricsResponse getAverageCheckInTime() {
+    public MetricsResponse getAverageCheckInTime(LocalDate startDate, LocalDate endDate) {
         var email = SecurityContextHolder.getContext().getAuthentication().getName();
         var user =  userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return MetricsResponse.builder()
                 .message("Average check-in time retrieved for user: " + user.getEmail())
-                .data(getAverageCheckInTime(user.getId()))
+                .data(getAverageCheckInTime(user.getId(), startDate, endDate))
                 .build();
 
     }
 
-    public MetricsResponse getAverageCheckOutTime() {
+    public MetricsResponse getAverageCheckOutTime(LocalDate startDate, LocalDate endDate) {
         var email = SecurityContextHolder.getContext().getAuthentication().getName();
         var user =  userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return MetricsResponse.builder()
                 .message("Average check-out time retrieved for user: " + user.getEmail())
-                .data(getAverageCheckOutTime(user.getId()))
+                .data(getAverageCheckOutTime(user.getId(), startDate, endDate))
                 .build();
     }
 
-    private LocalTime getAverageCheckInTime(Long userId) {
-        Double avgSeconds = attendanceRepository.findAverageCheckInTimeInSecondsByUserId(userId);
+    private LocalTime getAverageCheckInTime(Long userId, LocalDate startDate, LocalDate endDate) {
+        Double avgSeconds = attendanceRepository.findAverageCheckInTimeInSecondsByUserIdAndDateRange(userId, startDate, endDate);
         return convertToLocalTime(avgSeconds);
     }
 
-    private LocalTime getAverageCheckOutTime(Long userId) {
-        Double avgSeconds = attendanceRepository.findAverageCheckOutTimeInSecondsByUserId(userId);
+    private LocalTime getAverageCheckOutTime(Long userId, LocalDate startDate, LocalDate endDate) {
+        Double avgSeconds = attendanceRepository.findAverageCheckOutTimeInSecondsByUserIdAndDateRange(userId, startDate, endDate);
         return convertToLocalTime(avgSeconds);
     }
 
