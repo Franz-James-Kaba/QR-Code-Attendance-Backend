@@ -1,15 +1,19 @@
 package com.attendance_system.service;
 
+import com.attendance_system.exceptions.ResourceNotFoundException;
 import com.attendance_system.model.Session;
 import com.attendance_system.repository.SessionRepository;
 import com.attendance_system.request.GenerateSessionRequest;
+import com.attendance_system.request.UpdateSessionRequest;
 import com.attendance_system.response.QRCodeResponse;
+import com.attendance_system.response.SuccessResponse;
 import com.google.zxing.WriterException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -39,5 +43,41 @@ public class SessionService {
                 .qrCodeImage(qrcode.toByteArray())
                 .build();
 
+    }
+
+    public List<Session> getAllSessions() {
+        return repository.findAll();
+    }
+
+    public Session getSessionById(Integer sessionId) {
+        return repository.findById(sessionId).orElseThrow(
+                () -> new ResourceNotFoundException("Session not found")
+        );
+    }
+
+    public SuccessResponse deleteSession(Integer sessionId) {
+        var session = getSessionById(sessionId);
+        repository.delete(session);
+        return SuccessResponse.builder()
+                .message("Session deleted successfully")
+                .success(true)
+                .build();
+    }
+
+    public SuccessResponse updateSession(Integer sessionId, UpdateSessionRequest request) {
+        var session = getSessionById(sessionId);
+
+        if (request.name() != null)
+            session.setName(request.name());
+        if (request.startTime() != null)
+            session.setStartTime(request.startTime());
+        if (request.endTime() != null)
+            session.setEndTime(request.endTime());
+
+        repository.save(session);
+        return SuccessResponse.builder()
+                .success(true)
+                .message("Session updated successfully")
+                .build();
     }
 }
