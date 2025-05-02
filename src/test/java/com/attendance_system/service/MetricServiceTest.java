@@ -54,9 +54,9 @@ class MetricsServiceTest {
         when(userRepository.findByEmail(USER_EMAIL)).thenReturn(java.util.Optional.of(testUser));
         when(attendanceRepository.findAverageCheckInTimeInSecondsByUserId(USER_ID)).thenReturn(36000.0); // 10:00:00
 
-        LocalTime result = metricsService.getAverageCheckInTime();
+        var result = metricsService.getAverageCheckInTime();
 
-        assertEquals(LocalTime.of(10, 0), result);
+        assertEquals(LocalTime.of(10, 0), result.getData());
         verify(userRepository).findByEmail(USER_EMAIL);
         verify(attendanceRepository).findAverageCheckInTimeInSecondsByUserId(USER_ID);
     }
@@ -77,9 +77,9 @@ class MetricsServiceTest {
         when(userRepository.findByEmail(USER_EMAIL)).thenReturn(java.util.Optional.of(testUser));
         when(attendanceRepository.findAverageCheckOutTimeInSecondsByUserId(USER_ID)).thenReturn(64800.0); // 18:00:00
 
-        LocalTime result = metricsService.getAverageCheckOutTime();
+        var result = metricsService.getAverageCheckOutTime();
 
-        assertEquals(LocalTime.of(18, 0), result);
+        assertEquals(LocalTime.of(18, 0), result.getData());
     }
 
     @Test

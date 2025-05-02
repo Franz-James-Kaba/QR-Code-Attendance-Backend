@@ -9,6 +9,7 @@ import com.attendance_system.model.User;
 import com.attendance_system.repository.AttendanceRepository;
 import com.attendance_system.repository.SessionRepository;
 import com.attendance_system.repository.UserRepository;
+import com.attendance_system.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,13 +35,16 @@ public class AttendanceService {
     private static final LocalTime DEFAULT_EARLY_TIME = LocalTime.of(7, 30);
     private static final int DEFAULT_PAGE_SIZE = 100;
 
-    public String checkIn(String sessionCode) {
+    public SuccessResponse checkIn(String sessionCode) {
         validateSession(sessionCode);
 
         var user = getAuthenticatedUser();
         var today = LocalDate.now();
         if (attendanceRepository.existsByDateAndUser(today, user))
-            return "Attendance already recorded for today";
+            return SuccessResponse.builder()
+                    .message("Attendance already recorded for today")
+                    .success(false)
+                    .build();
 
         var attendance = Attendance.builder()
                 .checkInTime(LocalDateTime.now())
@@ -50,10 +54,13 @@ public class AttendanceService {
         attendanceRepository.save(attendance);
         logAttendance(user.getEmail());
 
-        return "Attendance recorded successfully";
+        return SuccessResponse.builder()
+                .success(true)
+                .message("Attendance recorded successfully")
+                .build();
     }
 
-    public String checkOut(String sessionCode) {
+    public SuccessResponse checkOut(String sessionCode) {
         validateSession(sessionCode);
 
         var user = getAuthenticatedUser();
@@ -66,14 +73,20 @@ public class AttendanceService {
         LocalDateTime minCheckOutDateTime = LocalDateTime.of(today, minCheckOutTime);
 
         if (LocalDateTime.now().isBefore(minCheckOutDateTime)) {
-            return "Cannot check out before 4:30 PM";
+            return SuccessResponse.builder()
+                    .message("Cannot check out before 4:30 PM")
+                    .success(false)
+                    .build();
         }
 
         attendance.setCheckOutTime(LocalDateTime.now());
         attendanceRepository.save(attendance);
         logAttendance(user.getEmail());
 
-        return "Checked out successfully";
+        return SuccessResponse.builder()
+                .message("Checked out successfully")
+                .success(true)
+                .build();
     }
 
     private static void logAttendance(String email) {

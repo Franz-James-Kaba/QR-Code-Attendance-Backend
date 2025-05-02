@@ -55,11 +55,11 @@ class SessionServiceTest {
                 .thenReturn(qrStream);
 
         // Act
-        byte[] result = sessionService.generateQRCode(request, width, height);
+        var result = sessionService.generateQRCode(request, width, height);
 
         // Assert
         assertNotNull(result);
-        assertArrayEquals(qrStream.toByteArray(), result);
+        assertArrayEquals(qrStream.toByteArray(), result.getQrCodeImage());
 
         // Verify session is saved with correct properties
         ArgumentCaptor<Session> sessionCaptor = ArgumentCaptor.forClass(Session.class);
@@ -89,11 +89,11 @@ class SessionServiceTest {
                 .thenReturn(qrStream);
 
         // Act
-        byte[] result = sessionService.generateQRCode(request, width, height);
+        var result = sessionService.generateQRCode(request, width, height);
 
         // Assert
         assertNotNull(result);
-        assertArrayEquals(qrStream.toByteArray(), result);
+        assertArrayEquals(qrStream.toByteArray(), result.getQrCodeImage());
 
         // Verify session is saved with correct properties
         ArgumentCaptor<Session> sessionCaptor = ArgumentCaptor.forClass(Session.class);

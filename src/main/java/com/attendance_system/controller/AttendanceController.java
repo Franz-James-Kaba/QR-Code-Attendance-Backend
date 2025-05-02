@@ -1,5 +1,6 @@
 package com.attendance_system.controller;
 
+import com.attendance_system.response.SuccessResponse;
 import com.attendance_system.service.AttendanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,12 +15,12 @@ public class AttendanceController {
     private final AttendanceService service;
 
     @PostMapping("/check-in")
-    public ResponseEntity<String> checkIn(@RequestParam("session-code") String sessionCode) {
+    public ResponseEntity<SuccessResponse> checkIn(@RequestParam("session-code") String sessionCode) {
         return ResponseEntity.ok(service.checkIn(sessionCode));
     }
 
     @PutMapping("/check-out")
-    public ResponseEntity<String> checkOut(@RequestParam("session-code") String sessionCode) {
+    public ResponseEntity<SuccessResponse> checkOut(@RequestParam("session-code") String sessionCode) {
         return ResponseEntity.ok(service.checkOut(sessionCode));
     }
 }
