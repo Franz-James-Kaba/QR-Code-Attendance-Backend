@@ -241,10 +241,10 @@ class AttendanceServiceTest {
         when(attendanceRepository.existsByDateAndUser(any(LocalDate.class), any())).thenReturn(false);
 
         // When
-        String result = attendanceService.checkIn(SESSION_CODE);
+        var result = attendanceService.checkIn(SESSION_CODE);
 
         // Then
-        assertEquals("Attendance recorded successfully", result);
+        assertEquals("Attendance recorded successfully", result.getMessage());
         verify(attendanceRepository).save(any(Attendance.class));
     }
 
@@ -254,10 +254,10 @@ class AttendanceServiceTest {
         when(attendanceRepository.existsByDateAndUser(any(LocalDate.class), any())).thenReturn(true);
 
         // When
-        String result = attendanceService.checkIn(SESSION_CODE);
+        var result = attendanceService.checkIn(SESSION_CODE);
 
         // Then
-        assertEquals("Attendance already recorded for today", result);
+        assertEquals("Attendance already recorded for today", result.getMessage());
         verify(attendanceRepository, never()).save(any(Attendance.class));
     }
 

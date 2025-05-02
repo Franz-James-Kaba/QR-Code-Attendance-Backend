@@ -3,6 +3,7 @@ package com.attendance_system.service;
 import com.attendance_system.model.Session;
 import com.attendance_system.repository.SessionRepository;
 import com.attendance_system.request.GenerateSessionRequest;
+import com.attendance_system.response.QRCodeResponse;
 import com.google.zxing.WriterException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ public class SessionService {
     private final QRCodeGenerator qrCodeGenerator;
     private final SessionSchedulerService sessionSchedulerService;
 
-    public byte[] generateQRCode(GenerateSessionRequest request, int width, int height) throws IOException, WriterException {
+    public QRCodeResponse generateQRCode(GenerateSessionRequest request, int width, int height) throws IOException, WriterException {
         var sessionCode = UUID.randomUUID().toString();
         var qrcode = qrCodeGenerator.generateQRCode(sessionCode, width, height);
 
@@ -32,7 +33,10 @@ public class SessionService {
         repository.save(session);
         sessionSchedulerService.scheduleSessionActivation(session);
         sessionSchedulerService.scheduleSessionInvalidation(session);
-        return qrcode.toByteArray();
+        return QRCodeResponse.builder()
+                .message("QRCode generated successfully")
+                .qrCodeImage(qrcode.toByteArray())
+                .build();
 
     }
 }

@@ -36,9 +36,14 @@ Creates a new admin user in the system.
 }
 ```
 **Response:**
-
 - Status: 200 OK
-- Body: "User created successfully"
+- Body:
+    ```json
+    {
+      "message": "User created successfully",
+      "success": true
+    }
+    ```
 
 **Notes:**
 - A temporary password will be generated and sent to the provided email.
@@ -78,7 +83,13 @@ Initiates the password reset process by sending a reset token to the user's emai
 
 **Response:**
 - Status: 200 OK
-- Body: "Password reset code sent to your email address"
+- Body:
+    ```json
+    {
+      "message": "Password reset code sent to your email address",
+      "success": true
+    }
+    ```
 
 #### Reset Password
 
@@ -101,7 +112,13 @@ Resets a user's password using the token sent to their email.
 ```
 **Response:**
 - Status: 200 OK
-- Body: "Password reset successful"
+- Body:
+    ```json
+    {
+      "message": "Password reset successful",
+      "success": true
+    }
+    ```
 
 #### First-time Password Reset
 
@@ -122,7 +139,14 @@ Allows users to reset their temporary password after first login.
 ```
 **Response:**
 - Status: 200 OK
-- Body: "Password reset successful"
+- Body:
+    ```json
+    {
+      "message": "Password reset successful",
+      "success": true
+    }
+    ```
+
 
 ### Admin Operations
 
@@ -146,7 +170,13 @@ Creates a new regular user.
 ```
 **Response:**
 - Status: 200 OK
-- Body: "User registered successfully"
+- Body:
+    ```json
+    {
+      "message": "User registered successfully",
+      "success": true
+    }
+    ```
 
 #### Create Facilitator
 
@@ -167,7 +197,14 @@ Creates a new facilitator user.
 ```
 **Response:**
 - Status: 200 OK
-- Body: "User created successfully"
+- Body:
+    ```json
+    {
+      "message": "User created successfully",
+      "success": true
+    }
+    ```
+
 
 
 #### Get User by Email
@@ -397,9 +434,14 @@ Grants reception privilege to a facilitator user.
 -   `email`: The email address of the facilitator user.
 
 **Response:**
-
--   Status: 200 OK
--   Body: `"Reception privilege granted"`
+- Status: 200 OK
+- Body:
+    ```json
+    {
+      "message": "Reception privilege granted",
+      "success": true
+    }
+    ```
 
 #### Revoke Reception Privilege
 
@@ -412,9 +454,15 @@ Revokes reception privilege from a receptionist user.
 -   `email`: The email address of the receptionist user.
 
 **Response:**
+- Status: 200 OK
+- Body:
+    ```json
+    {
+      "message": "Reception privilege revoked",
+      "success": true
+    }
+    ```
 
--   Status: 200 OK
--   Body: `"Reception privilege revoked"`
 
 
 #### Update User
@@ -461,7 +509,13 @@ Deletes a user from the system.
 
 **Response:**
 - Status: 200 OK
-- Body: "User deleted successfully"
+- Body:
+    ```json
+    {
+      "message": "User deleted successfully",
+      "success": true
+    }
+    ```
 
 ## Error Responses
 
@@ -496,6 +550,16 @@ Generates a QR code for an attendance session. This endpoint is protected and re
 }
 ```
 
+**Response:**
+- Status: 200 OK
+- Body:
+    ```json
+    {
+      "message": "QR code generated successfully",
+      "qrCodeImage": "<base64-encoded PNG image bytes>"
+    }
+    ```
+
 ### Attendance Tracking
 
 These endpoints are available to users with either the 'NSP' or 'FACILITATOR' role.
@@ -514,8 +578,19 @@ Records the user's check-in time for a specific attendance session.
 
 -   Status: 200 OK
 -   Body:
-    *   `"Attendance recorded successfully"` - If the check-in was successful.
-    *   `"Attendance already recorded for today"` - If the user has already checked in today.
+    ```json
+    {
+      "message": "Attendance recorded successfully",
+      "success": true
+    }
+    ```
+    or
+    ```json
+    {
+      "message": "Attendance already recorded for today",
+      "success": false
+    }
+    ```
 
 #### Check-Out
 
@@ -531,8 +606,62 @@ Records the user's check-out time for a specific attendance session.
 
 -   Status: 200 OK
 -   Body:
-    *   `"Checked out successfully"` - If the check-out was successful.
-    *   `"Cannot check out before minimum work period (8 hours)"` - If the user attempts to check out less than 8 hours after checking in.
+    ```json
+    {
+      "message": "Checked out successfully",
+      "success": true
+    }
+    ```
+    or
+    ```json
+    {
+      "message": "Cannot check out before minimum work period (8 hours)",
+      "success": false
+    }
+    ```
+
+
+---
+
+### Metrics Endpoints
+
+These endpoints were not previously documented in your README:
+
+```markdown
+### Metrics Endpoints
+
+#### Get Average Check-In Time
+
+**Method:** `GET /api/nsp/average-check-in-time`
+
+Retrieves the average check-in time for the current user's role (NSP, Facilitator, or Admin).
+
+**Response:**
+- Status: 200 OK
+- Body:
+    ```json
+    {
+      "message": "Average check-in time retrieved successfully",
+      "data": "08:45:30"
+    }
+    ```
+
+#### Get Average Check-Out Time
+
+**Method:** `GET /api/nsp/average-check-out-time`
+
+Retrieves the average check-out time for the current user's role (NSP, Facilitator, or Admin).
+
+**Response:**
+- Status: 200 OK
+- Body:
+    ```json
+    {
+      "message": "Average check-out time retrieved successfully",
+      "data": "17:15:45"
+    }
+    ```
+
 
 
 **Error Responses:**
@@ -540,7 +669,6 @@ Records the user's check-out time for a specific attendance session.
 -   404 Not Found: "Session not found" - If the provided session code does not exist.
 -   400 Bad Request: "Session invalid or expired" - If the session is not active.
 -   404 Not Found: "No check-in record found for today" - If the user tries to check out without checking in first.
-
 
 
 

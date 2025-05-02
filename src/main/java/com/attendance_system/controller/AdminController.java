@@ -8,6 +8,7 @@ import com.attendance_system.model.Attendance;
 import com.attendance_system.model.User;
 import com.attendance_system.request.RegisterRequest;
 import com.attendance_system.request.UpdateUserRequest;
+import com.attendance_system.response.SuccessResponse;
 import com.attendance_system.role.FacilitatorRole;
 import com.attendance_system.role.NSPRole;
 import com.attendance_system.role.Role;
@@ -52,7 +53,7 @@ public class AdminController {
     }
 
     @PostMapping("/create-facilitator")
-    public ResponseEntity<String> createFacilitator(@Valid @RequestBody RegisterRequest request) throws MessagingException {
+    public ResponseEntity<SuccessResponse> createFacilitator(@Valid @RequestBody RegisterRequest request) throws MessagingException {
         return ResponseEntity.ok(userService.createUser(request, new FacilitatorRole()));
     }
 
@@ -157,12 +158,12 @@ public class AdminController {
     }
 
     @PostMapping("/grant-reception-privilege/{email}")
-    public ResponseEntity<String> grantReceptionPrivilege(@PathVariable("email") String email) {
+    public ResponseEntity<SuccessResponse> grantReceptionPrivilege(@PathVariable("email") String email) {
         return ResponseEntity.ok(userService.grantReceptionPrivilege(email));
     }
 
     @PostMapping("/revoke-reception-privilege/{email}")
-    public ResponseEntity<String> revokeReceptionPrivilege(@PathVariable("email") String email) {
+    public ResponseEntity<SuccessResponse> revokeReceptionPrivilege(@PathVariable("email") String email) {
         return ResponseEntity.ok(userService.revokeReceptionPrivilege(email));
     }
 
