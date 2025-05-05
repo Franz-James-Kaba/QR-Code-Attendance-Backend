@@ -76,3 +76,11 @@ jobs:
             --cluster qrcode-cluster \
             --service qrcode-service \
             --task-definition ${{ env.TASK_DEF_ARN }}
+
+      - name: Wait for service stability
+        run: |
+          echo "Waiting for service to stabilize..."
+          aws ecs wait services-stable \
+            --cluster qrcode-cluster \
+            --service qrcode-service
+          echo "Service is now stable."
