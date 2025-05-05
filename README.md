@@ -560,6 +560,149 @@ Generates a QR code for an attendance session. This endpoint is protected and re
     }
     ```
 
+#### Get All Sessions
+
+**Method:** `GET /api/session`
+
+Retrieves a list of all attendance sessions.
+
+**Response:**
+```json
+[
+  {
+    "id": 1,
+    "sessionCode": "a1b2c3d4-5678-90ab-cdef-1234567890ab",
+    "name": "Morning Session",
+    "active": true,
+    "startTime": "2025-05-03T09:00:00",
+    "endTime": "2025-05-03T17:00:00"
+  },
+  {
+    "id": 2,
+    "sessionCode": "b2c3d4e5-6789-01bc-defa-2345678901bc",
+    "name": "Afternoon Session",
+    "active": false,
+    "startTime": "2025-05-03T13:00:00",
+    "endTime": "2025-05-03T17:00:00"
+  }
+]
+```
+
+#### Get Session by ID
+
+**Method:** `GET /api/session/{sessionId}`
+
+Retrieves details of a specific session by its ID.
+
+**Path Parameters:**
+sessionId: The ID of the session.
+
+**Response:**
+
+-   Status: 200 OK
+-   Body:
+    ```json
+    {
+      "id": 1,
+      "sessionCode": "a1b2c3d4-5678-90ab-cdef-1234567890ab",
+      "name": "Morning Session",
+      "active": true,
+      "startTime": "2025-05-03T09:00:00",
+      "endTime": "2025-05-03T17:00:00"
+    }
+    ```
+
+#### Get All Inactive Sessions
+
+**Method:** `GET /api/session/inactive`
+
+Retrieves a list of all inactive sessions.
+
+**Response:**
+```json[
+  {
+    "id": 2,
+    "sessionCode": "b2c3d4e5-6789-01bc-defa-2345678901bc",
+    "name": "Afternoon Session",
+    "active": false,
+    "startTime": "2025-05-03T13:00:00",
+    "endTime": "2025-05-03T17:00:00"
+  }
+]
+```
+
+#### Get All Active Sessions
+
+**Method:** `GET /api/session/active`
+
+Retrieves a list of all active sessions.
+
+**Response:**
+
+```json[
+  {
+    "id": 1,
+    "sessionCode": "a1b2c3d4-5678-90ab-cdef-1234567890ab",
+    "name": "Morning Session",
+    "active": true,
+    "startTime": "2025-05-03T09:00:00",
+    "endTime": "2025-05-03T17:00:00"
+  }
+]
+```
+
+#### Update Session
+
+**Method:** `PUT /api/session/{sessionId}`
+
+Updates the details of a session.
+
+**Path Parameters:**
+
+sessionId: The ID of the session to update.
+
+**Request Body:**
+
+```json{
+  "name": "Updated Session Name",
+  "startTime": "2025-05-03T10:00:00",
+  "endTime": "2025-05-03T18:00:00"
+}
+```
+All fields are optional; only provided fields will be updated.
+
+**Response:**
+
+```json{
+  "message": "Session updated successfully",
+  "success": true
+}
+```
+
+
+#### Delete Session
+
+**Method:** `DELETE /api/session/{sessionId}`
+
+Deletes a session by its ID.
+
+**Path Parameters:**
+
+sessionId: The ID of the session to delete.
+
+**Response:**
+
+```json{
+  "message": "Session deleted successfully",
+  "success": true
+}
+```
+Notes:
+
+All session endpoints require the qrcode:generate authority.
+The session object fields are: id, sessionCode, name, active, startTime, endTime.
+Dates and times are in ISO 8601 format.
+
 ### Attendance Tracking
 
 These endpoints are available to users with either the 'NSP' or 'FACILITATOR' role.
@@ -625,43 +768,73 @@ Records the user's check-out time for a specific attendance session.
 
 ### Metrics Endpoints
 
-These endpoints were not previously documented in your README:
+These endpoints are available to users with the 'FACILITATOR', 'NSP', or 'ADMIN' role.
 
-```markdown
-### Metrics Endpoints
+#### Get Average Check-In Time (Current User)
 
-#### Get Average Check-In Time
+**Method:** `GET /api/metrics/average-check-in-time?startDate={startDate}&endDate={endDate}`
 
-**Method:** `GET /api/nsp/average-check-in-time`
+Retrieves the average check-in time for the currently authenticated user.  
+Date range is optional; if omitted, the average is calculated over all available data.
 
-Retrieves the average check-in time for the current user's role (NSP, Facilitator, or Admin).
+**Query Parameters:**
+
+- `startDate` (optional): The start date (format: YYYY-MM-DD)
+- `endDate` (optional): The end date (format: YYYY-MM-DD)
 
 **Response:**
 - Status: 200 OK
 - Body:
     ```json
     {
-      "message": "Average check-in time retrieved successfully",
+      "message": "Average check-in time retrieved for user: user@example.com",
       "data": "08:45:30"
     }
     ```
+    - `data` is an ISO time string (`HH:mm:ss`). If no data is available, `data` may be `null`.
 
-#### Get Average Check-Out Time
+---
 
-**Method:** `GET /api/nsp/average-check-out-time`
+#### Get Average Check-Out Time (Current User)
 
-Retrieves the average check-out time for the current user's role (NSP, Facilitator, or Admin).
+**Method:** `GET /api/metrics/average-check-out-time?startDate={startDate}&endDate={endDate}`
+
+Retrieves the average check-out time for the currently authenticated user.  
+Date range is optional; if omitted, the average is calculated over all available data.
+
+**Query Parameters:**
+
+- `startDate` (optional): The start date (format: YYYY-MM-DD)
+- `endDate` (optional): The end date (format: YYYY-MM-DD)
 
 **Response:**
 - Status: 200 OK
 - Body:
     ```json
     {
-      "message": "Average check-out time retrieved successfully",
+      "message": "Average check-out time retrieved for user: user@example.com",
       "data": "17:15:45"
     }
     ```
+    - `data` is an ISO time string (`HH:mm:ss`). If no data is available, `data` may be `null`.
 
+---
+
+#### Get User Profile
+
+**Method:** `GET /api/metrics/user-info`
+
+Retrieves the profile information of the currently authenticated user.
+
+**Response:**
+- Status: 200 OK
+- Body:
+    ```json
+    {
+      "fullName": "Jane Marie Smith",
+      "role": "NSP"
+    }
+    ```
 
 
 **Error Responses:**

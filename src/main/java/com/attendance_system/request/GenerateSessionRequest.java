@@ -7,6 +7,9 @@ import java.time.LocalDateTime;
 
 public record GenerateSessionRequest(
     @NotNull(message = "Start time is required")
+    String name,
+
+    @NotNull(message = "Start time is required")
     @Future(message = "Start time must be in the future")
     LocalDateTime startTime,
 

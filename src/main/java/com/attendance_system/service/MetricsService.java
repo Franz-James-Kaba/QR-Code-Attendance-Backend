@@ -3,6 +3,7 @@ package com.attendance_system.service;
 import com.attendance_system.repository.AttendanceRepository;
 import com.attendance_system.repository.UserRepository;
 import com.attendance_system.response.MetricsResponse;
+import com.attendance_system.response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -16,34 +17,34 @@ public class MetricsService {
     private final UserRepository userRepository;
 
 
-    public MetricsResponse getAverageCheckInTime() {
+    public MetricsResponse getAverageCheckInTime(LocalDate startDate, LocalDate endDate) {
         var email = SecurityContextHolder.getContext().getAuthentication().getName();
         var user =  userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return MetricsResponse.builder()
                 .message("Average check-in time retrieved for user: " + user.getEmail())
-                .data(getAverageCheckInTime(user.getId()))
+                .data(getAverageCheckInTime(user.getId(), startDate, endDate))
                 .build();
 
     }
 
-    public MetricsResponse getAverageCheckOutTime() {
+    public MetricsResponse getAverageCheckOutTime(LocalDate startDate, LocalDate endDate) {
         var email = SecurityContextHolder.getContext().getAuthentication().getName();
         var user =  userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return MetricsResponse.builder()
                 .message("Average check-out time retrieved for user: " + user.getEmail())
-                .data(getAverageCheckOutTime(user.getId()))
+                .data(getAverageCheckOutTime(user.getId(), startDate, endDate))
                 .build();
     }
 
-    private LocalTime getAverageCheckInTime(Long userId) {
-        Double avgSeconds = attendanceRepository.findAverageCheckInTimeInSecondsByUserId(userId);
+    private LocalTime getAverageCheckInTime(Long userId, LocalDate startDate, LocalDate endDate) {
+        Double avgSeconds = attendanceRepository.findAverageCheckInTimeInSecondsByUserIdAndDateRange(userId, startDate, endDate);
         return convertToLocalTime(avgSeconds);
     }
 
-    private LocalTime getAverageCheckOutTime(Long userId) {
-        Double avgSeconds = attendanceRepository.findAverageCheckOutTimeInSecondsByUserId(userId);
+    private LocalTime getAverageCheckOutTime(Long userId, LocalDate startDate, LocalDate endDate) {
+        Double avgSeconds = attendanceRepository.findAverageCheckOutTimeInSecondsByUserIdAndDateRange(userId, startDate, endDate);
         return convertToLocalTime(avgSeconds);
     }
 
@@ -103,6 +104,21 @@ public class MetricsService {
                 null;
     }
 
+    public UserResponse getUserProfile() {
+        var email = SecurityContextHolder.getContext().getAuthentication().getName();
+        var user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        var fullName = user.getMiddleName().isEmpty() ?
+                user.getFirstName() + " " + user.getLastName() :
+                user.getFirstName() + " " + user.getMiddleName() + " " + user.getLastName();
+
+        return UserResponse.builder()
+                .fullName(fullName)
+                .role(user.getRole())
+                .build();
+    }
+
 
     private LocalTime convertToLocalTime(Double avgSeconds) {
         if (avgSeconds == null) return null;
@@ -128,5 +144,4 @@ public class MetricsService {
             throw new IllegalArgumentException("Start date cannot be after end date");
         }
     }
-
 }

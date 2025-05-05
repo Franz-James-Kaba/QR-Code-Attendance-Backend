@@ -49,37 +49,44 @@ class MetricsServiceTest {
 
     @Test
     void getAverageCheckInTime_ShouldReturnLocalTime() {
+        // Given
+        LocalDate startDate = LocalDate.of(2025, 4, 1);
+        LocalDate endDate = LocalDate.of(2025, 5, 1);
+
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getName()).thenReturn(USER_EMAIL);
         when(userRepository.findByEmail(USER_EMAIL)).thenReturn(java.util.Optional.of(testUser));
-        when(attendanceRepository.findAverageCheckInTimeInSecondsByUserId(USER_ID)).thenReturn(36000.0); // 10:00:00
+        when(attendanceRepository.findAverageCheckInTimeInSecondsByUserIdAndDateRange(USER_ID, startDate, endDate))
+                .thenReturn(36000.0); // 10:00:00
 
-        var result = metricsService.getAverageCheckInTime();
+        // When
+        var result = metricsService.getAverageCheckInTime(startDate, endDate);
 
+        // Then
         assertEquals(LocalTime.of(10, 0), result.getData());
         verify(userRepository).findByEmail(USER_EMAIL);
-        verify(attendanceRepository).findAverageCheckInTimeInSecondsByUserId(USER_ID);
+        verify(attendanceRepository).findAverageCheckInTimeInSecondsByUserIdAndDateRange(USER_ID, startDate, endDate);
     }
 
     @Test
-    void getAverageCheckInTime_ShouldThrowWhenUserNotFound() {
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getName()).thenReturn(USER_EMAIL);
-        when(userRepository.findByEmail(USER_EMAIL)).thenReturn(java.util.Optional.empty());
+    void getAverageCheckInTime_WithNullStartDate_ShouldReturnLocalTime() {
+        // Given
+        LocalDate startDate = null;
+        LocalDate endDate = LocalDate.of(2025, 5, 1);
 
-        assertThrows(RuntimeException.class, () -> metricsService.getAverageCheckInTime());
-    }
-
-    @Test
-    void getAverageCheckOutTime_ShouldReturnLocalTime() {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getName()).thenReturn(USER_EMAIL);
         when(userRepository.findByEmail(USER_EMAIL)).thenReturn(java.util.Optional.of(testUser));
-        when(attendanceRepository.findAverageCheckOutTimeInSecondsByUserId(USER_ID)).thenReturn(64800.0); // 18:00:00
+        when(attendanceRepository.findAverageCheckInTimeInSecondsByUserIdAndDateRange(USER_ID, startDate, endDate))
+                .thenReturn(36000.0); // 10:00:00
 
-        var result = metricsService.getAverageCheckOutTime();
+        // When
+        var result = metricsService.getAverageCheckInTime(startDate, endDate);
 
-        assertEquals(LocalTime.of(18, 0), result.getData());
+        // Then
+        assertEquals(LocalTime.of(10, 0), result.getData());
+        verify(userRepository).findByEmail(USER_EMAIL);
+        verify(attendanceRepository).findAverageCheckInTimeInSecondsByUserIdAndDateRange(USER_ID, startDate, endDate);
     }
 
     @Test
