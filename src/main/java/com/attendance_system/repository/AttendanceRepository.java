@@ -1,5 +1,6 @@
 package com.attendance_system.repository;
 
+import com.attendance_system.dto.AttendanceDTO;
 import com.attendance_system.model.Attendance;
 import com.attendance_system.model.User;
 import org.springframework.data.domain.Page;
@@ -11,13 +12,14 @@ import org.springframework.data.repository.query.Param;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
-    @Query("SELECT a FROM Attendance a WHERE a.checkInTime >= :startDateTime AND a.checkInTime <= :endDateTime")
-    Page<Attendance> findAttendeesBetweenDates(
-            @Param("startDateTime") LocalDateTime startDateTime,
-            @Param("endDateTime") LocalDateTime endDateTime,
+    @Query("SELECT a FROM Attendance a WHERE a.date = :date")
+    Page<Attendance> findAttendeesByDate(
+            @Param("date") LocalDate date,
             Pageable pageable);
     Optional<Attendance> findByUserAndDate(User user, LocalDate date);
     boolean existsByDateAndUser(LocalDate today, User user);

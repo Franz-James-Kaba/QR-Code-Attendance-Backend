@@ -367,16 +367,14 @@ Retrieves a paginated list of all facilitators.
 
 #### Get Early Attendees
 
-**Method:** `GET api/admin/early-attendees?startDate={startDate}&endDate={endDate}&page={page}&size={size}`
+**Method:** `GET api/admin/early-attendees?date={date}`
 
-Retrieves a paginated list of attendees who checked in early within a specified date range.
+Retrieves  list of the first ten (10) attendees who checked in early on the specified date.
 
 **Query Parameters:**
 
--   `startDate`: The start date for the search range (format: YYYY-MM-DD).
--   `endDate`: The end date for the search range (format: YYYY-MM-DD).
--   `page`: The page number to retrieve (default: 0).
--   `size`: The number of attendees per page (default: 100).
+-   `date`: The start date for the search range (format: YYYY-MM-DD).
+
 
 **Response:**
 
@@ -385,42 +383,32 @@ Retrieves a paginated list of attendees who checked in early within a specified 
 -   Body:
 
     ```json
+    [
     {
-      "content": [
-        {
-          "id": 1,
-          "checkInTime": "2024-01-20T07:25:00",
-          "checkOutTime": null,
-          "userId": 123,
-          "date": "2024-01-20"
-        }
-      ],
-      "pageable": {
-        "sort": {
-          "empty": true,
-          "sorted": false,
-          "unsorted": true
-        },
-        "offset": 0,
-        "pageNumber": 0,
-        "pageSize": 100,
-        "paged": true,
-        "unpaged": false
-      },
-      "last": true,
-      "totalPages": 1,
-      "totalElements": 1,
-      "size": 100,
-      "number": 0,
-      "sort": {
-        "empty": true,
-        "sorted": false,
-        "unsorted": true
-      },
-      "first": true,
-      "numberOfElements": 1,
-      "empty": false
+        "firstName": "Test",
+        "lastName": "Another Test",
+        "role": "NSP",
+        "checkInTime": "2025-04-29T06:30:00"
+    },
+    {
+        "firstName": "Admin",
+        "lastName": "Admin",
+        "role": "NSP",
+        "checkInTime": "2025-04-29T06:30:03"
+    },
+    {
+        "firstName": "Facilitator",
+        "lastName": "Test",
+        "role": "FACILITATOR",
+        "checkInTime": "2025-04-29T06:55:34"
+    },
+    {
+        "firstName": "Internal",
+        "lastName": "Test",
+        "role": "NSP",
+        "checkInTime": "2025-04-29T07:26:48"
     }
+]
     ```
 
 #### Grant Reception Privilege

@@ -1,5 +1,6 @@
 package com.attendance_system.service;
 
+import com.attendance_system.dto.AttendanceDTO;
 import com.attendance_system.exceptions.AttendanceServiceException;
 import com.attendance_system.exceptions.InvalidSessionException;
 import com.attendance_system.exceptions.ResourceNotFoundException;
@@ -12,10 +13,7 @@ import com.attendance_system.repository.UserRepository;
 import com.attendance_system.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -31,9 +29,8 @@ import java.util.stream.Collectors;
 public class AttendanceService {
     private final AttendanceRepository attendanceRepository;
     private final SessionRepository sessionRepository;
-    private final UserRepository  userRepository;
+    private final UserRepository userRepository;
     private static final LocalTime DEFAULT_EARLY_TIME = LocalTime.of(7, 30);
-    private static final int DEFAULT_PAGE_SIZE = 100;
 
     public SuccessResponse checkIn(String sessionCode) {
         validateSession(sessionCode);
@@ -107,63 +104,40 @@ public class AttendanceService {
     }
 
 
-
-    /**
-     * Retrieves attendees who checked in early within the specified date range.
-     *
-     * @param startDate The start date (inclusive) for the search range
-     * @param endDate The end date (inclusive) for the search range
-     * @param page The page number (zero-based)
-     * @param size The page size
-     * @return A page of early attendees
-     * @throws IllegalArgumentException if date parameters are invalid
-     */
-    public Page<Attendance> getEarlyAttendees(LocalDate startDate, LocalDate endDate, int page, int size) {
-        // Validate inputs
-        validateDateRange(startDate, endDate);
-
-        // Set up pagination - use default values if invalid parameters are provided
-        page = Math.max(0, page);
-        size = (size <= 0) ? DEFAULT_PAGE_SIZE : size;
-        Pageable pageable = PageRequest.of(page, size);
+    public List<AttendanceDTO> getEarlyAttendees(LocalDate date) {
+        if (date == null) {
+            throw new IllegalArgumentException("Date cannot be null");
+        }
 
         try {
-            LocalDateTime startDateTime = startDate.atStartOfDay();
-            LocalDateTime endDateTime = endDate.plusDays(1).atStartOfDay().minusNanos(1);
+            LocalTime earlyTime = DEFAULT_EARLY_TIME; // e.g., LocalTime.of(9, 0); // 9:00 AM
 
-            Page<Attendance> allAttendees = attendanceRepository.findAttendeesBetweenDates(
-                    startDateTime, endDateTime, pageable);
+            // Use the original repository method, but limit to 5 results
+            Pageable pageable = PageRequest.of(0, 10, Sort.by("checkInTime").ascending());
+            Page<Attendance> attendancePage = attendanceRepository.findAttendeesByDate(
+                    date, pageable);
 
-            // Filter in Java instead of in the database
-            List<Attendance> earlyAttendees = allAttendees.getContent().stream()
-                    .filter(a -> a.getCheckInTime().toLocalTime().isBefore(DEFAULT_EARLY_TIME))
+            // Filter early attendees in Java and map to DTOs
+            return attendancePage.getContent().stream()
+                    .filter(attendance -> attendance.getCheckInTime().toLocalTime().isBefore(earlyTime))
+                    .limit(5)
+                    .map(this::convertToDTO)
                     .collect(Collectors.toList());
-
-            return new PageImpl<>(earlyAttendees, pageable, earlyAttendees.size());
         } catch (Exception e) {
             log.error("Error retrieving early attendees", e);
             throw new AttendanceServiceException("Failed to retrieve early attendees", e);
         }
     }
 
-    /**
-     * Validates that the provided date range is valid.
-     *
-     * @param startDate The start date
-     * @param endDate The end date
-     * @throws IllegalArgumentException if dates are null or startDate is after endDate
-     */
-    private void validateDateRange(LocalDate startDate, LocalDate endDate) {
-        if (startDate == null) {
-            throw new IllegalArgumentException("Start date cannot be null");
-        }
-
-        if (endDate == null) {
-            throw new IllegalArgumentException("End date cannot be null");
-        }
-
-        if (startDate.isAfter(endDate)) {
-            throw new IllegalArgumentException("Start date cannot be after end date");
-        }
+    // Helper method to convert Attendance to AttendanceDTO
+    private AttendanceDTO convertToDTO(Attendance attendance) {
+        User user = attendance.getUser();
+        return new AttendanceDTO(
+                user.getFirstName(),
+                user.getLastName(),
+                user.getRole(),
+                attendance.getCheckInTime()
+        );
     }
+
 }
