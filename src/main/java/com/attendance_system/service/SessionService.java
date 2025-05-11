@@ -23,7 +23,7 @@ public class SessionService {
     private final QRCodeGenerator qrCodeGenerator;
     private final SessionSchedulerService sessionSchedulerService;
 
-    public QRCodeResponse generateQRCode(GenerateSessionRequest request, int width, int height) throws IOException, WriterException {
+    public byte[] generateQRCode(GenerateSessionRequest request, int width, int height) throws IOException, WriterException {
         var sessionCode = UUID.randomUUID().toString();
         var qrcode = qrCodeGenerator.generateQRCode(sessionCode, width, height);
 
@@ -38,10 +38,7 @@ public class SessionService {
         repository.save(session);
         sessionSchedulerService.scheduleSessionActivation(session);
         sessionSchedulerService.scheduleSessionInvalidation(session);
-        return QRCodeResponse.builder()
-                .message("QRCode generated successfully")
-                .qrCodeImage(qrcode.toByteArray())
-                .build();
+        return qrcode;
 
     }
 

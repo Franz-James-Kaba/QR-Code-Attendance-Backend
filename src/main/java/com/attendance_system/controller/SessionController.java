@@ -27,7 +27,7 @@ public class SessionController {
     private final SessionService service;
 
     @PostMapping("/generate-qrcode")
-    public ResponseEntity<QRCodeResponse> generateQRCode(@RequestBody @Valid GenerateSessionRequest request,
+    public ResponseEntity<byte[]> generateQRCode(@RequestBody @Valid GenerateSessionRequest request,
                                                          @RequestParam(defaultValue = "250") int width,
                                                          @RequestParam(defaultValue = "250") int height
     ) throws IOException, WriterException
