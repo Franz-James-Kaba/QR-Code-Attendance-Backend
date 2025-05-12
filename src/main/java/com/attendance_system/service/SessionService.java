@@ -5,7 +5,6 @@ import com.attendance_system.model.Session;
 import com.attendance_system.repository.SessionRepository;
 import com.attendance_system.request.GenerateSessionRequest;
 import com.attendance_system.request.UpdateSessionRequest;
-import com.attendance_system.response.QRCodeResponse;
 import com.attendance_system.response.SuccessResponse;
 import com.google.zxing.WriterException;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +37,7 @@ public class SessionService {
         repository.save(session);
         sessionSchedulerService.scheduleSessionActivation(session);
         sessionSchedulerService.scheduleSessionInvalidation(session);
-        return qrcode;
+        return qrcode.toByteArray();
 
     }
 
