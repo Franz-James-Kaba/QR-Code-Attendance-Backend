@@ -540,13 +540,7 @@ Generates a QR code for an attendance session. This endpoint is protected and re
 
 **Response:**
 - Status: 200 OK
-- Body:
-    ```json
-    {
-      "message": "QR code generated successfully",
-      "qrCodeImage": "<base64-encoded PNG image bytes>"
-    }
-    ```
+- qrcode bytes image
 
 #### Get All Sessions
 
