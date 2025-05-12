@@ -3,7 +3,6 @@ package com.attendance_system.controller;
 import com.attendance_system.model.Session;
 import com.attendance_system.request.GenerateSessionRequest;
 import com.attendance_system.request.UpdateSessionRequest;
-import com.attendance_system.response.QRCodeResponse;
 import com.attendance_system.response.SuccessResponse;
 import com.attendance_system.service.SessionService;
 import com.google.zxing.WriterException;
@@ -27,7 +26,7 @@ public class SessionController {
     private final SessionService service;
 
     @PostMapping("/generate-qrcode")
-    public ResponseEntity<QRCodeResponse> generateQRCode(@RequestBody @Valid GenerateSessionRequest request,
+    public ResponseEntity<byte[]> generateQRCode(@RequestBody @Valid GenerateSessionRequest request,
                                                          @RequestParam(defaultValue = "250") int width,
                                                          @RequestParam(defaultValue = "250") int height
     ) throws IOException, WriterException

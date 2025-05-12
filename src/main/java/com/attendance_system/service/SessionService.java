@@ -5,7 +5,6 @@ import com.attendance_system.model.Session;
 import com.attendance_system.repository.SessionRepository;
 import com.attendance_system.request.GenerateSessionRequest;
 import com.attendance_system.request.UpdateSessionRequest;
-import com.attendance_system.response.QRCodeResponse;
 import com.attendance_system.response.SuccessResponse;
 import com.google.zxing.WriterException;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,7 @@ public class SessionService {
     private final QRCodeGenerator qrCodeGenerator;
     private final SessionSchedulerService sessionSchedulerService;
 
-    public QRCodeResponse generateQRCode(GenerateSessionRequest request, int width, int height) throws IOException, WriterException {
+    public byte[] generateQRCode(GenerateSessionRequest request, int width, int height) throws IOException, WriterException {
         var sessionCode = UUID.randomUUID().toString();
         var qrcode = qrCodeGenerator.generateQRCode(sessionCode, width, height);
 
@@ -38,10 +37,7 @@ public class SessionService {
         repository.save(session);
         sessionSchedulerService.scheduleSessionActivation(session);
         sessionSchedulerService.scheduleSessionInvalidation(session);
-        return QRCodeResponse.builder()
-                .message("QRCode generated successfully")
-                .qrCodeImage(qrcode.toByteArray())
-                .build();
+        return qrcode.toByteArray();
 
     }
 

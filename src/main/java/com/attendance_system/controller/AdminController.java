@@ -1,5 +1,6 @@
 package com.attendance_system.controller;
 
+import com.attendance_system.dto.AttendanceDTO;
 import com.attendance_system.dto.UserDTO;
 import com.attendance_system.exceptions.AttendanceServiceException;
 import com.attendance_system.exceptions.UnauthorizedUserException;
@@ -34,6 +35,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -132,13 +134,9 @@ public class AdminController {
 
     @GetMapping("/early-attendees")
     public ResponseEntity<?> getEarlyAttendees(
-            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "100") int size) {
-
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         try {
-            Page<Attendance> earlyAttendees = attendanceService.getEarlyAttendees(startDate, endDate, page, size);
+            List<AttendanceDTO> earlyAttendees = attendanceService.getEarlyAttendees(date);
             return ResponseEntity.ok(earlyAttendees);
         } catch (IllegalArgumentException e) {
             log.warn("Invalid request parameters: {}", e.getMessage());
