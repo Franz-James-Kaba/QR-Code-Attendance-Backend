@@ -10,9 +10,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://qr-code-frontend-alb-800572897.us-east-1.elb.amazonaws.com", "http://localhost:4200")
+                .allowedOrigins("http://qr-code-frontend-alb-800572897.us-east-1.elb.amazonaws.com/")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(true); 
+                .allowCredentials(true);
     }
 } 
