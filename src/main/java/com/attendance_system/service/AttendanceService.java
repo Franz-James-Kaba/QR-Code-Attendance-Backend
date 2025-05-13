@@ -10,10 +10,14 @@ import com.attendance_system.model.User;
 import com.attendance_system.repository.AttendanceRepository;
 import com.attendance_system.repository.SessionRepository;
 import com.attendance_system.repository.UserRepository;
+import com.attendance_system.response.AttendanceListResponse;
 import com.attendance_system.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -83,6 +87,19 @@ public class AttendanceService {
         return SuccessResponse.builder()
                 .message("Checked out successfully")
                 .success(true)
+                .build();
+    }
+
+    public AttendanceListResponse getUserAttendanceHistory() {
+        var user = getAuthenticatedUser();
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusDays(7);
+
+        var attendanceList = attendanceRepository.findByUserAndDateBetweenOrderByDateDesc(user, startDate, endDate);
+        return AttendanceListResponse.builder()
+                .success(true)
+                .message("User attendance history retrieved successfully")
+                .attendanceList(attendanceList)
                 .build();
     }
 
