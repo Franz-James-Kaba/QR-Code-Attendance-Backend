@@ -74,4 +74,6 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
+
+    List<Attendance> findByUserAndDateBetweenOrderByDateDesc(User user, LocalDate startDate, LocalDate endDate);
 }

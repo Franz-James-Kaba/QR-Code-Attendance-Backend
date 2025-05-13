@@ -1,5 +1,6 @@
 package com.attendance_system.controller;
 
+import com.attendance_system.response.AttendanceListResponse;
 import com.attendance_system.response.SuccessResponse;
 import com.attendance_system.service.AttendanceService;
 import lombok.RequiredArgsConstructor;
@@ -22,5 +23,10 @@ public class AttendanceController {
     @PutMapping("/check-out")
     public ResponseEntity<SuccessResponse> checkOut(@RequestParam("session-code") String sessionCode) {
         return ResponseEntity.ok(service.checkOut(sessionCode));
+    }
+
+    @GetMapping
+    public ResponseEntity<AttendanceListResponse> getUserAttendanceHistory() {
+        return ResponseEntity.ok(service.getUserAttendanceHistory());
     }
 }
