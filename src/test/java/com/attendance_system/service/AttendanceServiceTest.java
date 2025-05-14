@@ -28,7 +28,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -62,10 +61,10 @@ class AttendanceServiceTest {
     private AttendanceService attendanceService;
 
     @Captor
-    private ArgumentCaptor<LocalDateTime> startDateTimeCaptor;
+    private ArgumentCaptor<LocalTime> startTimeCaptor;
 
     @Captor
-    private ArgumentCaptor<LocalDateTime> endDateTimeCaptor;
+    private ArgumentCaptor<LocalTime> endTimeCaptor;
 
     @Captor
     private ArgumentCaptor<Pageable> pageableCaptor;
@@ -102,7 +101,6 @@ class AttendanceServiceTest {
     void getFirstFiveEarlyAttendees_shouldReturnEmptyListWhenNoEarlyAttendees() {
         // Arrange
         LocalDate date = LocalDate.now();
-        LocalTime lateTime = DEFAULT_EARLY_TIME.plusHours(1); // All check-ins are after early time
         Page<Attendance> emptyPage = new PageImpl<>(Collections.emptyList());
 
         when(attendanceRepository.findAttendeesByDate(eq(date), any(Pageable.class)))
@@ -120,17 +118,17 @@ class AttendanceServiceTest {
     void getFirstFiveEarlyAttendees_shouldReturnEarlyAttendeesSortedAndLimited() {
         // Arrange
         LocalDate date = LocalDate.now();
-        LocalDateTime earlyCheckIn = LocalDateTime.of(date, DEFAULT_EARLY_TIME.minusMinutes(30));
-        LocalDateTime earlyCheckIn1 = LocalDateTime.of(date, DEFAULT_EARLY_TIME.minusMinutes(25));
-        LocalDateTime lateCheckIn = LocalDateTime.of(date, DEFAULT_EARLY_TIME.plusMinutes(30));
+        LocalTime earlyCheckIn = DEFAULT_EARLY_TIME.minusMinutes(30);
+        LocalTime earlyCheckIn1 = DEFAULT_EARLY_TIME.minusMinutes(25);
+        LocalTime lateCheckIn = DEFAULT_EARLY_TIME.plusMinutes(30);
 
         // Create test data - mixed early and late attendees
         List<Attendance> attendees = Arrays.asList(
-                createAttendance(lateCheckIn,null),
-                createAttendance( earlyCheckIn,null),
-                createAttendance(lateCheckIn,null),
+                createAttendance(lateCheckIn, null),
+                createAttendance(earlyCheckIn, null),
+                createAttendance(lateCheckIn, null),
                 createAttendance(earlyCheckIn1, null),
-        createAttendance(LocalDateTime.of(date, DEFAULT_EARLY_TIME), null)
+                createAttendance(DEFAULT_EARLY_TIME, null)
         );
 
         Page<Attendance> page = new PageImpl<>(attendees);
@@ -144,7 +142,7 @@ class AttendanceServiceTest {
         // Assert
         assertEquals(2, result.size()); // Only 2 are before early time
         assertTrue(result.stream().allMatch(dto ->
-                dto.getCheckInTime().toLocalTime().isBefore(DEFAULT_EARLY_TIME)));
+                dto.getCheckInTime().isBefore(DEFAULT_EARLY_TIME)));
 
         // Verify sorting - earliest should be first
         assertTrue(result.get(0).getCheckInTime().isBefore(result.get(1).getCheckInTime()));
@@ -169,11 +167,11 @@ class AttendanceServiceTest {
         });
     }
 
-    private Attendance createAttendance(Long id, String firstName, String lastName, Role role, LocalDateTime checkInTime) {
+    private Attendance createAttendance(Long id, String firstName, String lastName, Role role, LocalTime checkInTime) {
         Attendance attendance = new Attendance();
         attendance.setId(id);
         attendance.setCheckInTime(checkInTime);
-        attendance.setDate(checkInTime.toLocalDate());
+        attendance.setDate(LocalDate.now());
 
         User user = new User();
         user.setFirstName(firstName);
@@ -206,7 +204,7 @@ class AttendanceServiceTest {
         var result = attendanceService.checkIn(SESSION_CODE);
 
         // Then
-        assertEquals("Attendance already recorded for today", result.getMessage());
+        assertEquals("User already checked in today", result.getMessage());
         verify(attendanceRepository, never()).save(any(Attendance.class));
     }
 
@@ -243,10 +241,6 @@ class AttendanceServiceTest {
         verify(attendanceRepository, never()).save(any(Attendance.class));
     }
 
-
-
-
-
     @Test
     void checkOut_InvalidSession() {
         // Given - override the default active session
@@ -282,13 +276,13 @@ class AttendanceServiceTest {
     }
 
     // Helper methods
-    private Attendance createAttendance(LocalDateTime checkInTime, LocalDateTime checkOutTime) {
+    private Attendance createAttendance(LocalTime checkInTime, LocalTime checkOutTime) {
         return Attendance.builder()
                 .user(user)
                 .date(LocalDate.now())
                 .checkInTime(checkInTime)
                 .checkOutTime(checkOutTime)
+                .position(0) // set position if needed
                 .build();
     }
-
 }
