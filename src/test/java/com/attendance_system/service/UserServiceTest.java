@@ -14,7 +14,6 @@ import com.attendance_system.request.AuthenticationRequest;
 import com.attendance_system.request.RegisterRequest;
 import com.attendance_system.request.ResetPasswordRequest;
 import com.attendance_system.request.UpdateUserRequest;
-import com.attendance_system.response.AuthenticationResponse;
 import com.attendance_system.role.AdminRole;
 import com.attendance_system.role.FacilitatorRole;
 import com.attendance_system.role.NSPRole;
@@ -34,7 +33,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
@@ -572,81 +570,94 @@ class UserServiceTest {
     }
 
     @Test
-    void testGrantReceptionPrivilege_Success() {
+    void testGrantReceptionPrivilege_Success() throws MessagingException {
+        // Arrange
+        // Since getReceptionist() is private, we need to mock userRepository.findByRole
+        User receptionist = new User();
+        receptionist.setEmail("reception@example.com");
+        receptionist.setRole(RECEPTION);
+
         when(userRepository.findByEmail(facilitatorUser.getEmail()))
                 .thenReturn(Optional.of(facilitatorUser));
-        when(userRepository.save(any(User.class))).thenReturn(facilitatorUser);
+        when(userRepository.findByRole(RECEPTION))
+                .thenReturn(receptionist);
+        when(passwordGenerator.generatePassword(12)).thenReturn(generatedPassword);
+        when(passwordEncoder.encode(generatedPassword)).thenReturn(encodedPassword);
+        doNothing().when(emailService).sendReceptionCredentials(
+                eq(facilitatorUser.getEmail()),
+                eq(facilitatorUser.getFirstName()),
+                eq(receptionist.getEmail()),
+                eq(generatedPassword)
+        );
 
+        // Act
         var result = userService.grantReceptionPrivilege(facilitatorUser.getEmail());
 
+        // Assert
         assertEquals("Reception privilege granted", result.getMessage());
-        assertEquals(RECEPTION, facilitatorUser.getRole());
-        verify(userRepository).save(facilitatorUser);
+        assertTrue(result.isSuccess());
+        verify(passwordEncoder).encode(generatedPassword);
+        verify(emailService).sendReceptionCredentials(
+                facilitatorUser.getEmail(),
+                facilitatorUser.getFirstName(),
+                receptionist.getEmail(),
+                generatedPassword
+        );
     }
 
-    // grantReceptionPrivilege: not facilitator
     @Test
-    void testGrantReceptionPrivilege_NotFacilitator() {
+    void testGrantReceptionPrivilege_NotFacilitator() throws MessagingException {
+        // Arrange
         when(userRepository.findByEmail(nspUser.getEmail()))
                 .thenReturn(Optional.of(nspUser));
 
+        // Act
         var result = userService.grantReceptionPrivilege(nspUser.getEmail());
 
+        // Assert
         assertEquals("Only facilitators should be granted reception privilege", result.getMessage());
-        assertEquals(Role.NSP, nspUser.getRole());
-        verify(userRepository, never()).save(any());
+        assertFalse(result.isSuccess());
+        verify(passwordGenerator, never()).generatePassword(anyInt());
+        verify(emailService, never()).sendReceptionCredentials(anyString(), anyString(), anyString(), anyString());
     }
 
-    // grantReceptionPrivilege: user not found
     @Test
-    void testGrantReceptionPrivilege_UserNotFound() {
+    void testGrantReceptionPrivilege_UserNotFound() throws MessagingException {
+        // Arrange
         when(userRepository.findByEmail("unknown@example.com"))
                 .thenReturn(Optional.empty());
 
+        // Act & Assert
         Exception exception = assertThrows(UserNotFoundException.class, () ->
                 userService.grantReceptionPrivilege("unknown@example.com"));
 
         assertEquals("User not found", exception.getMessage());
-        verify(userRepository, never()).save(any());
+        verify(passwordGenerator, never()).generatePassword(anyInt());
+        verify(emailService, never()).sendReceptionCredentials(anyString(), anyString(), anyString(), anyString());
     }
 
-    // revokeReceptionPrivilege: success
     @Test
     void testRevokeReceptionPrivilege_Success() {
-        when(userRepository.findByEmail(receptionUser.getEmail()))
-                .thenReturn(Optional.of(receptionUser));
-        when(userRepository.save(any(User.class))).thenReturn(receptionUser);
+        // Arrange
+        User receptionist = new User();
+        receptionist.setEmail("reception@example.com");
+        receptionist.setPassword("oldPassword");
+        receptionist.setRole(RECEPTION);
 
-        var result = userService.revokeReceptionPrivilege(receptionUser.getEmail());
+        when(userRepository.findByRole(RECEPTION))
+                .thenReturn(receptionist);
+        when(passwordGenerator.generatePassword(10)).thenReturn(generatedPassword);
+        when(passwordEncoder.encode(generatedPassword)).thenReturn(encodedPassword);
 
+        // Act
+        var result = userService.revokeReceptionPrivilege();
+
+        // Assert
         assertEquals("Reception privilege revoked", result.getMessage());
-        assertEquals(FACILITATOR, receptionUser.getRole());
-        verify(userRepository).save(receptionUser);
+        assertTrue(result.isSuccess());
+        assertEquals(encodedPassword, receptionist.getPassword());
+        verify(passwordEncoder).encode(generatedPassword);
     }
 
-    // revokeReceptionPrivilege: not receptionist
-    @Test
-    void testRevokeReceptionPrivilege_NotReceptionist() {
-        when(userRepository.findByEmail(facilitatorUser.getEmail()))
-                .thenReturn(Optional.of(facilitatorUser));
 
-        var result = userService.revokeReceptionPrivilege(facilitatorUser.getEmail());
-
-        assertEquals("Only receptionists should have reception privilege revoked", result.getMessage());
-        assertEquals(FACILITATOR, facilitatorUser.getRole());
-        verify(userRepository, never()).save(any());
-    }
-
-    // revokeReceptionPrivilege: user not found
-    @Test
-    void testRevokeReceptionPrivilege_UserNotFound() {
-        when(userRepository.findByEmail("unknown@example.com"))
-                .thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(UserNotFoundException.class, () ->
-                userService.revokeReceptionPrivilege("unknown@example.com"));
-
-        assertEquals("User not found", exception.getMessage());
-        verify(userRepository, never()).save(any());
-    }
 }
