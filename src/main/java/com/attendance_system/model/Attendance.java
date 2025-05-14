@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -19,10 +20,10 @@ public class Attendance {
     private Long id;
 
     @Column(name = "check_in_time", nullable = false)
-    private LocalDateTime checkInTime;
+    private LocalTime checkInTime;
 
     @Column(name = "check_out_time")
-    private LocalDateTime checkOutTime;
+    private LocalTime checkOutTime;
 
     @Column(name = "date", nullable = false)
     private LocalDate date;
@@ -30,5 +31,8 @@ public class Attendance {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @Column
+    private int position;
 
 }
