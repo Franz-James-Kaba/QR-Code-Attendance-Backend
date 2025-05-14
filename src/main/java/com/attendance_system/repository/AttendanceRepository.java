@@ -2,6 +2,7 @@ package com.attendance_system.repository;
 
 import com.attendance_system.model.Attendance;
 import com.attendance_system.model.User;
+import com.attendance_system.role.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -47,7 +48,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
             @Param("endDate") LocalDate endDate);
 
     @Query(value = """
-    SELECT to_timestamp(AVG(EXTRACT(EPOCH FROM CAST(a.check_in_time AS TIME))))
+    SELECT to_timestamp(AVG(EXTRACT(EPOCH FROM check_in_time)))
     FROM attendance a
     JOIN nsp u ON a.user_id = u.id
     WHERE u.role = CAST(:role AS text)
@@ -60,7 +61,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     );
 
     @Query(value = """
-    SELECT to_timestamp(AVG(EXTRACT(EPOCH FROM CAST(a.check_out_time AS TIME))))
+    SELECT to_timestamp(AVG(EXTRACT(EPOCH FROM check_out_time)))
     FROM attendance a
     JOIN nsp u ON a.user_id = u.id
     WHERE u.role = CAST(:role AS text)
@@ -73,4 +74,9 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     );
 
     List<Attendance> findByUserAndDateBetweenOrderByDateDesc(User user, LocalDate startDate, LocalDate endDate);
+
+    int countByDateAndUserRole(LocalDate date, Role role);
+
+//    List<Attendance> findByDateAndUserRoleOrderByPosition(LocalDate date, Role role);
+//    List<Attendance> findByDateOrderByUserRoleAscPositionAsc(LocalDate date);
 }

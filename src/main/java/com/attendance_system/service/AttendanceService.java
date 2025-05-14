@@ -43,14 +43,18 @@ public class AttendanceService {
         var today = LocalDate.now();
         if (attendanceRepository.existsByDateAndUser(today, user))
             return SuccessResponse.builder()
-                    .message("Attendance already recorded for today")
+                    .message("User already checked in today")
                     .success(false)
                     .build();
+
+        var userRole = user.getRole();
+        int position = attendanceRepository.countByDateAndUserRole(today, userRole) + 1;
 
         var attendance = Attendance.builder()
                 .checkInTime(LocalTime.now())
                 .user(user)
                 .date(LocalDate.now())
+                .position(position)
                 .build();
         attendanceRepository.save(attendance);
         logAttendance(user.getEmail());
@@ -58,6 +62,20 @@ public class AttendanceService {
         return SuccessResponse.builder()
                 .success(true)
                 .message("Attendance recorded successfully")
+                .build();
+    }
+
+    public PositionResponse getUserPosition() {
+        var user = getAuthenticatedUser();
+        var today = LocalDate.now();
+
+        var attendance = attendanceRepository.findByUserAndDate(user, today)
+                .orElseThrow(() -> new ResourceNotFoundException("Attendance not found"));
+
+        return PositionResponse.builder()
+                .success(true)
+                .message("Position retrieved successfully")
+                .position(attendance.getPosition())
                 .build();
     }
 
@@ -69,6 +87,12 @@ public class AttendanceService {
 
         var attendance = attendanceRepository.findByUserAndDate(user, today)
                 .orElseThrow(() -> new ResourceNotFoundException("No check-in record found for today"));
+
+        if (attendance.getCheckOutTime() != null)
+            return SuccessResponse.builder()
+                    .success(false)
+                    .message("User already checked out today")
+                    .build();
 
         LocalTime minCheckOutTime = LocalTime.of(16, 30);
         LocalDateTime minCheckOutDateTime = LocalDateTime.of(today, minCheckOutTime);
@@ -155,5 +179,6 @@ public class AttendanceService {
                 attendance.getCheckInTime()
         );
     }
+
 
 }

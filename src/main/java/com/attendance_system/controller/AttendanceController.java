@@ -3,6 +3,7 @@ package com.attendance_system.controller;
 import com.attendance_system.response.AttendanceListResponse;
 import com.attendance_system.response.SuccessResponse;
 import com.attendance_system.service.AttendanceService;
+import com.attendance_system.service.PositionResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,5 +29,10 @@ public class AttendanceController {
     @GetMapping
     public ResponseEntity<AttendanceListResponse> getUserAttendanceHistory() {
         return ResponseEntity.ok(service.getUserAttendanceHistory());
+    }
+
+    @GetMapping("/position")
+    public ResponseEntity<PositionResponse> getUserPosition() {
+        return ResponseEntity.ok(service.getUserPosition());
     }
 }
