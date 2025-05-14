@@ -82,4 +82,36 @@ public class EmailService {
         helper.setText(template, true);
         mailSender.send(mimeMessage);
     }
+
+    public void sendReceptionCredentials(
+            String recipient,
+            String firstName,
+            String receptionEmail,
+            String password
+    ) throws MessagingException {
+        String templateName = "reception_credentials";
+        String subject = "Reception Account Credentials";
+
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(
+                mimeMessage,
+                MULTIPART_MODE_MIXED,
+                UTF_8.name()
+        );
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("firstName", firstName);
+        properties.put("receptionEmail", receptionEmail);
+        properties.put("receptionPassword", password);
+
+        Context context = new Context();
+        context.setVariables(properties);
+
+        helper.setFrom(emailConfiguration.getUsername());
+        helper.setTo(recipient);
+        helper.setSubject(subject);
+
+        String template = templateEngine.process(templateName, context);
+        helper.setText(template, true);
+        mailSender.send(mimeMessage);
+    }
 }

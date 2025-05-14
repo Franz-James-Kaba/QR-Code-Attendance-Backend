@@ -178,18 +178,21 @@ public class UserService {
     }
 
     @Transactional
-    public SuccessResponse grantReceptionPrivilege(String email) {
-        var user = userRepository.findByEmail(email)
+    public SuccessResponse grantReceptionPrivilege(String facilitatorEmail) throws MessagingException {
+        var facilitator = userRepository.findByEmail(facilitatorEmail)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        if (!user.getRole().equals(FACILITATOR))
+        if (!facilitator.getRole().equals(FACILITATOR))
             return SuccessResponse.builder()
                     .success(false)
                     .message("Only facilitators should be granted reception privilege")
                     .build();
 
-        user.setRole(RECEPTION);
-        userRepository.save(user);
+        var password = passwordGenerator.generatePassword(12);
+        var receptionist = getReceptionist();
+        receptionist.setPassword(passwordEncoder.encode(password));
+        emailService.sendReceptionCredentials(facilitatorEmail, facilitator.getFirstName(), receptionist.getEmail(), password);
+
         return SuccessResponse.builder()
                 .success(true)
                 .message("Reception privilege granted")
@@ -197,18 +200,10 @@ public class UserService {
     }
 
     @Transactional
-    public SuccessResponse revokeReceptionPrivilege(String email) {
-        var user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+    public SuccessResponse revokeReceptionPrivilege() {
+        var receptionist = getReceptionist();
+        receptionist.setPassword(passwordEncoder.encode(passwordGenerator.generatePassword(10)));
 
-        if (!user.getRole().equals(RECEPTION))
-            return SuccessResponse.builder()
-                    .success(false)
-                    .message("Only receptionists should have reception privilege revoked")
-                    .build();
-
-        user.setRole(FACILITATOR);
-        userRepository.save(user);
         return SuccessResponse.builder()
                 .success(true)
                 .message("Reception privilege revoked")
@@ -216,10 +211,10 @@ public class UserService {
     }
 
     //getting a facilitator
+
     public Page<User> getAllFacilitators(Pageable pageable) {
         return userRepository.findByRole(FACILITATOR, pageable);
     }
-
 
     private void validateRequest(String email, Token savedToken) {
         if (!email.equals(savedToken.getUser().getEmail()))
@@ -229,4 +224,8 @@ public class UserService {
             throw new TokenExpiredException("Token is expired.");
     }
 
+
+    private User getReceptionist() {
+        return userRepository.findByRole(RECEPTION);
+    }
 }
