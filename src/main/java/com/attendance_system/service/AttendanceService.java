@@ -48,7 +48,7 @@ public class AttendanceService {
                     .build();
 
         var attendance = Attendance.builder()
-                .checkInTime(LocalDateTime.now())
+                .checkInTime(LocalTime.now())
                 .user(user)
                 .date(LocalDate.now())
                 .build();
@@ -80,7 +80,7 @@ public class AttendanceService {
                     .build();
         }
 
-        attendance.setCheckOutTime(LocalDateTime.now());
+        attendance.setCheckOutTime(LocalTime.now());
         attendanceRepository.save(attendance);
         logAttendance(user.getEmail());
 
@@ -127,7 +127,6 @@ public class AttendanceService {
         }
 
         try {
-            LocalTime earlyTime = DEFAULT_EARLY_TIME; // e.g., LocalTime.of(9, 0); // 9:00 AM
 
             // Use the original repository method, but limit to 5 results
             Pageable pageable = PageRequest.of(0, 10, Sort.by("checkInTime").ascending());
@@ -136,7 +135,7 @@ public class AttendanceService {
 
             // Filter early attendees in Java and map to DTOs
             return attendancePage.getContent().stream()
-                    .filter(attendance -> attendance.getCheckInTime().toLocalTime().isBefore(earlyTime))
+                    .filter(attendance -> attendance.getCheckInTime().isBefore(DEFAULT_EARLY_TIME))
                     .limit(5)
                     .map(this::convertToDTO)
                     .collect(Collectors.toList());

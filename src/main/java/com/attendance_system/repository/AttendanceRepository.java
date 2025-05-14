@@ -1,6 +1,5 @@
 package com.attendance_system.repository;
 
-import com.attendance_system.dto.AttendanceDTO;
 import com.attendance_system.model.Attendance;
 import com.attendance_system.model.User;
 import org.springframework.data.domain.Page;
@@ -11,8 +10,6 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 

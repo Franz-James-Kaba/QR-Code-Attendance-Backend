@@ -1,9 +1,11 @@
 package com.attendance_system.dto;
 
 import com.attendance_system.role.Role;
-import lombok.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Data
 @Getter
@@ -12,10 +14,10 @@ public class AttendanceDTO {
     private String firstName;
     private String lastName;
     private String role;
-    private LocalDateTime checkInTime;
+    private LocalTime checkInTime;
 
 
-    public AttendanceDTO(String firstName, String lastName, Role role, LocalDateTime checkInTime) {
+    public AttendanceDTO(String firstName, String lastName, Role role, LocalTime checkInTime) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.role = String.valueOf(role);
