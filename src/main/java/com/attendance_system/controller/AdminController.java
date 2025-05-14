@@ -154,13 +154,13 @@ public class AdminController {
     }
 
     @PostMapping("/grant-reception-privilege/{email}")
-    public ResponseEntity<SuccessResponse> grantReceptionPrivilege(@PathVariable("email") String email) {
+    public ResponseEntity<SuccessResponse> grantReceptionPrivilege(@PathVariable("email") String email) throws MessagingException {
         return ResponseEntity.ok(userService.grantReceptionPrivilege(email));
     }
 
-    @PostMapping("/revoke-reception-privilege/{email}")
-    public ResponseEntity<SuccessResponse> revokeReceptionPrivilege(@PathVariable("email") String email) {
-        return ResponseEntity.ok(userService.revokeReceptionPrivilege(email));
+    @PostMapping("/revoke-reception-privilege")
+    public ResponseEntity<SuccessResponse> revokeReceptionPrivilege() {
+        return ResponseEntity.ok(userService.revokeReceptionPrivilege());
     }
 
     //average check in time for nsps
