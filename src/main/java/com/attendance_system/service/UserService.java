@@ -195,7 +195,7 @@ public class UserService {
 
         return SuccessResponse.builder()
                 .success(true)
-                .message("Reception privilege granted")
+                .message("Reception privilege granted. Reception account credentials sent to facilitator's email.")
                 .build();
     }
 
@@ -206,7 +206,7 @@ public class UserService {
 
         return SuccessResponse.builder()
                 .success(true)
-                .message("Reception privilege revoked")
+                .message("Reception privilege revoked. Reception account password changed.")
                 .build();
     }
 
