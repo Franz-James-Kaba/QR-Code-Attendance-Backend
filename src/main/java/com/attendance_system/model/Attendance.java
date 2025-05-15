@@ -34,4 +34,7 @@ public class Attendance {
     @Column
     private int position;
 
+    @Column
+    private int point;
+
 }
