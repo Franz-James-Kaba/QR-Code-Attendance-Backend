@@ -50,11 +50,20 @@ public class AttendanceService {
         var userRole = user.getRole();
         int position = attendanceRepository.countByDateAndUserRole(today, userRole) + 1;
 
+        int points = switch (position) {
+            case 1 -> 5;
+            case 2 -> 4;
+            case 3 -> 3;
+            case 4 -> 2;
+            default -> 1;
+        };
+
         var attendance = Attendance.builder()
                 .checkInTime(LocalTime.now())
                 .user(user)
                 .date(LocalDate.now())
                 .position(position)
+                .point(points)
                 .build();
         attendanceRepository.save(attendance);
         logAttendance(user.getEmail());
