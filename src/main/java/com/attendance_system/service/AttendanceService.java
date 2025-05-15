@@ -11,6 +11,7 @@ import com.attendance_system.repository.AttendanceRepository;
 import com.attendance_system.repository.SessionRepository;
 import com.attendance_system.repository.UserRepository;
 import com.attendance_system.response.AttendanceListResponse;
+import com.attendance_system.response.PositionResponse;
 import com.attendance_system.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,10 +43,7 @@ public class AttendanceService {
         var user = getAuthenticatedUser();
         var today = LocalDate.now();
         if (attendanceRepository.existsByDateAndUser(today, user))
-            return SuccessResponse.builder()
-                    .message("User already checked in today")
-                    .success(false)
-                    .build();
+            throw new IllegalStateException("User already checked in today");
 
         var userRole = user.getRole();
         int position = attendanceRepository.countByDateAndUserRole(today, userRole) + 1;
@@ -98,20 +96,14 @@ public class AttendanceService {
                 .orElseThrow(() -> new ResourceNotFoundException("No check-in record found for today"));
 
         if (attendance.getCheckOutTime() != null)
-            return SuccessResponse.builder()
-                    .success(false)
-                    .message("User already checked out today")
-                    .build();
+            throw new IllegalStateException("User already checked out today");
 
         LocalTime minCheckOutTime = LocalTime.of(16, 30);
         LocalDateTime minCheckOutDateTime = LocalDateTime.of(today, minCheckOutTime);
 
-        if (LocalDateTime.now().isBefore(minCheckOutDateTime)) {
-            return SuccessResponse.builder()
-                    .message("Cannot check out before 4:30 PM")
-                    .success(false)
-                    .build();
-        }
+        if (LocalDateTime.now().isBefore(minCheckOutDateTime))
+            throw new IllegalStateException("Cannot check out before 4:30 PM");
+
 
         attendance.setCheckOutTime(LocalTime.now());
         attendanceRepository.save(attendance);

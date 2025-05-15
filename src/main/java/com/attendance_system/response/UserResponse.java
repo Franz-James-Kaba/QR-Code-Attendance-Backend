@@ -9,6 +9,8 @@ import lombok.Setter;
 @Setter
 @Builder
 public class UserResponse {
-    private String fullName;
+    private String firstName;
+    private String middleName;
+    private String lastName;
     private Role role;
 }
