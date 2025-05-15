@@ -109,14 +109,19 @@ public class MetricsService {
         var user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        var fullName = user.getMiddleName().isEmpty() ?
-                user.getFirstName() + " " + user.getLastName() :
-                user.getFirstName() + " " + user.getMiddleName() + " " + user.getLastName();
-
-        return UserResponse.builder()
-                .fullName(fullName)
-                .role(user.getRole())
-                .build();
+        return user.getMiddleName().isEmpty() ?
+                UserResponse.builder()
+                        .firstName(user.getFirstName())
+                        .lastName(user.getLastName())
+                        .role(user.getRole())
+                        .build()
+                :
+                UserResponse.builder()
+                        .firstName(user.getFirstName())
+                        .middleName(user.getMiddleName())
+                        .lastName(user.getLastName())
+                        .role(user.getRole())
+                        .build();
     }
 
 

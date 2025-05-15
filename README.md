@@ -426,7 +426,7 @@ Grants reception privilege to a facilitator user.
 - Body:
     ```json
     {
-      "message": "Reception privilege granted",
+      "message": "Reception privilege granted. Reception account credentials sent to facilitator's email.",
       "success": true
     }
     ```
@@ -446,7 +446,7 @@ Revokes reception privilege from a receptionist user.
 - Body:
     ```json
     {
-      "message": "Reception privilege revoked",
+      "message": "Reception privilege revoked. Reception account password changed.",
       "success": true
     }
     ```
@@ -712,7 +712,7 @@ Records the user's check-in time for a specific attendance session.
     or
     ```json
     {
-      "message": "Attendance already recorded for today",
+      "message": "User already checked in today",
       "success": false
     }
     ```
@@ -802,6 +802,34 @@ Date range is optional; if omitted, the average is calculated over all available
 
 ---
 
+#### Get User Attendance History
+
+**Method:** `GET /api/attendance`
+
+Retrieves the authenticated user's attendance history.
+
+**Response:**
+- Status: 200 OK
+- Body:
+    ```json
+    {
+      "success": true,
+      "message": "Attendance history retrieved successfully",
+      "attendanceList": [
+        {
+          "id": 1,
+          "checkInTime": "08:30:00",
+          "checkOutTime": "17:00:00",
+          "date": "2025-05-01",
+          "user": { /* User object */ },
+          "position": 1
+        }
+        // ... more attendance records
+      ]
+    }
+    ```
+
+
 #### Get User Profile
 
 **Method:** `GET /api/metrics/user-info`
@@ -813,17 +841,30 @@ Retrieves the profile information of the currently authenticated user.
 - Body:
     ```json
     {
-      "fullName": "Jane Marie Smith",
+      "firstName": "Jane",
+      "middleName": "Marie",
+      "lastName": "Smith",
       "role": "NSP"
     }
     ```
 
+#### Get User Attendance Position
 
-**Error Responses:**
+**Method:** `GET /api/attendance/position`
 
--   404 Not Found: "Session not found" - If the provided session code does not exist.
--   400 Bad Request: "Session invalid or expired" - If the session is not active.
--   404 Not Found: "No check-in record found for today" - If the user tries to check out without checking in first.
+Retrieves the user's check-in position for the current day.
+
+**Response:**
+- Status: 200 OK
+- Body:
+    ```json
+    {
+      "success": true,
+      "message": "Position retrieved successfully",
+      "position": 3
+    }
+    ```
+
 
 
 

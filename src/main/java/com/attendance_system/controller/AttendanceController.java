@@ -3,7 +3,7 @@ package com.attendance_system.controller;
 import com.attendance_system.response.AttendanceListResponse;
 import com.attendance_system.response.SuccessResponse;
 import com.attendance_system.service.AttendanceService;
-import com.attendance_system.service.PositionResponse;
+import com.attendance_system.response.PositionResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
