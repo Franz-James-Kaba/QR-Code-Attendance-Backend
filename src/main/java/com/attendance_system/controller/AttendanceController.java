@@ -4,6 +4,7 @@ import com.attendance_system.exceptions.ErrorResponse;
 import com.attendance_system.exceptions.UnauthorizedUserException;
 import com.attendance_system.response.AttendanceListResponse;
 import com.attendance_system.response.SuccessResponse;
+import com.attendance_system.response.WorkingDaysResponse;
 import com.attendance_system.service.AttendanceService;
 import com.attendance_system.response.PositionResponse;
 import lombok.RequiredArgsConstructor;
@@ -53,5 +54,10 @@ public class AttendanceController {
                     .build();
             return new ResponseEntity<>(error, FORBIDDEN);
         }
+    }
+
+    @GetMapping("/working-days")
+    public ResponseEntity<WorkingDaysResponse> getWorkingDays() {
+        return ResponseEntity.ok(service.getWorkingDays());
     }
 }

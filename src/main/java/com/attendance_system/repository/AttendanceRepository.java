@@ -96,4 +96,22 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
                     "ORDER BY total_points DESC",
             nativeQuery = true)
     List<Map<String, Object>> findAllNspUsersWithTotalPointsAndRank();
+
+
+        @Query(value = """
+        SELECT COUNT(DISTINCT a.date)
+        FROM attendance a
+        WHERE a.user_id = :userId
+          AND EXTRACT(MONTH FROM a.date) = :month
+          AND EXTRACT(YEAR FROM a.date) = :year
+          AND EXTRACT(DOW FROM a.date) BETWEEN 1 AND 5
+        """, nativeQuery = true)
+        int countWeekdayAttendancesByUserAndMonth(
+                @Param("userId") Long userId,
+                @Param("month") int month,
+                @Param("year") int year
+        );
+
+    boolean existsByUserIdAndDateAndCheckInTimeIsNotNull(Long userId, LocalDate date);
+
 }
