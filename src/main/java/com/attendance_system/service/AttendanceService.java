@@ -11,6 +11,7 @@ import com.attendance_system.repository.UserRepository;
 import com.attendance_system.response.AttendanceListResponse;
 import com.attendance_system.response.PositionResponse;
 import com.attendance_system.response.SuccessResponse;
+import com.attendance_system.response.WorkingDaysResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -130,6 +131,20 @@ public class AttendanceService {
                 .build();
     }
 
+    public WorkingDaysResponse getWorkingDays() {
+        var user = getAuthenticatedUser();
+        var now = LocalDate.now();
+        var month = now.getMonthValue();
+        var year = now .getYear();
+
+        var workingDays = attendanceRepository.countWeekdayAttendancesByUserAndMonth(user.getId(), month, year);
+        return WorkingDaysResponse.builder()
+                .success(true)
+                .message("Working days retrieved successfully")
+                .workingDays(workingDays)
+                .build();
+    }
+
     private static void logAttendance(String email) {
         log.info("Attendance recorded for user with email address: {}", email);
     }
@@ -227,6 +242,4 @@ public class AttendanceService {
                 attendance.getCheckInTime()
         );
     }
-
-
 }

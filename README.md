@@ -844,7 +844,46 @@ Retrieves the profile information of the currently authenticated user.
       "firstName": "Jane",
       "middleName": "Marie",
       "lastName": "Smith",
-      "role": "NSP"
+      "role": "NSP",
+      "checkedIn": true
+    }
+    ```
+
+
+#### Get User Working Days
+
+**Method:** `GET /api/attendance/working-days`
+
+Retrieves the authenticated user's working days in the current month.
+
+**Response:**
+- Status: 200 OK
+- Body:
+    ```json
+    {
+      "success": true,
+      "message": "Working days retrieved successfully",
+      "workingDays": 12
+    }
+    ```
+
+
+#### Get User Profile
+
+**Method:** `GET /api/metrics/user-info`
+
+Retrieves the profile information of the currently authenticated user.
+
+**Response:**
+- Status: 200 OK
+- Body:
+    ```json
+    {
+      "firstName": "Jane",
+      "middleName": "Marie",
+      "lastName": "Smith",
+      "role": "NSP",
+      "checkedIn": true
     }
     ```
 
