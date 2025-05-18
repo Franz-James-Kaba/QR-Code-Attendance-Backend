@@ -1,10 +1,8 @@
 package com.attendance_system.service;
 
 import com.attendance_system.dto.AttendanceDTO;
-import com.attendance_system.exceptions.AttendanceServiceException;
-import com.attendance_system.exceptions.InvalidSessionException;
-import com.attendance_system.exceptions.ResourceNotFoundException;
-import com.attendance_system.exceptions.UserNotFoundException;
+import com.attendance_system.dto.UserPointsDTO;
+import com.attendance_system.exceptions.*;
 import com.attendance_system.model.Attendance;
 import com.attendance_system.model.User;
 import com.attendance_system.repository.AttendanceRepository;
@@ -13,20 +11,25 @@ import com.attendance_system.repository.UserRepository;
 import com.attendance_system.response.AttendanceListResponse;
 import com.attendance_system.response.PositionResponse;
 import com.attendance_system.response.SuccessResponse;
+import com.attendance_system.response.WorkingDaysResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -128,6 +131,20 @@ public class AttendanceService {
                 .build();
     }
 
+    public WorkingDaysResponse getWorkingDays() {
+        var user = getAuthenticatedUser();
+        var now = LocalDate.now();
+        var month = now.getMonthValue();
+        var year = now .getYear();
+
+        var workingDays = attendanceRepository.countWeekdayAttendancesByUserAndMonth(user.getId(), month, year);
+        return WorkingDaysResponse.builder()
+                .success(true)
+                .message("Working days retrieved successfully")
+                .workingDays(workingDays)
+                .build();
+    }
+
     private static void logAttendance(String email) {
         log.info("Attendance recorded for user with email address: {}", email);
     }
@@ -158,7 +175,7 @@ public class AttendanceService {
             Page<Attendance> attendancePage = attendanceRepository.findAttendeesByDate(
                     date, pageable);
 
-            // Filter early attendees in Java and map to DTOs
+            // Filter early attendees in Java and map to userPointsDTO
             return attendancePage.getContent().stream()
                     .filter(attendance -> attendance.getCheckInTime().isBefore(DEFAULT_EARLY_TIME))
                     .limit(5)
@@ -167,6 +184,51 @@ public class AttendanceService {
         } catch (Exception e) {
             log.error("Error retrieving early attendees", e);
             throw new AttendanceServiceException("Failed to retrieve early attendees", e);
+        }
+    }
+
+    public Integer getUserPointById(Long userId, Authentication authentication){
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        User currentUser = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if(!currentUser.getId().equals(userId)){
+            throw new UnauthorizedUserException("You are not authorized to view others points");
+        }
+
+
+        Integer points = attendanceRepository.getTotalPointsByUserId(userId);
+        return points != null ? points : 0;
+    }
+
+
+    public List<UserPointsDTO> getUsersLeaderboard() {
+        try {
+            List<Map<String, Object>> results = attendanceRepository.findAllNspUsersWithTotalPointsAndRank();
+            return results.stream()
+                    .map(this::mapToUserPointsDTO)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Failed to retrieve users leaderboard data", e);
+            throw new ServiceException("Failed to retrieve leaderboard data", e);
+        }
+    }
+
+    /**
+     * Maps a database result row to a UserPointsDTO object
+     */
+    private UserPointsDTO mapToUserPointsDTO(Map<String, Object> row) {
+        try {
+            UserPointsDTO dto = new UserPointsDTO();
+            dto.setUserId(((Number) row.getOrDefault("user_id", 0)).longValue());
+            dto.setFirstName((String) row.getOrDefault("first_name", ""));
+            dto.setLastName((String) row.getOrDefault("last_name", ""));
+            dto.setTotalPoints(((Number) row.getOrDefault("total_points", 0)).intValue());
+            dto.setPosition(((Number) row.getOrDefault("position", 0)).intValue());
+            return dto;
+        } catch (ClassCastException e) {
+            log.warn("Data type mismatch when mapping user data", e);
+            throw new DataMappingException("Error mapping user data: " + e.getMessage(), e);
         }
     }
 
@@ -180,6 +242,4 @@ public class AttendanceService {
                 attendance.getCheckInTime()
         );
     }
-
-
 }

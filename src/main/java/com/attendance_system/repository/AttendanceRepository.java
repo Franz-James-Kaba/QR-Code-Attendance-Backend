@@ -1,5 +1,6 @@
 package com.attendance_system.repository;
 
+import com.attendance_system.dto.UserPointsDTO;
 import com.attendance_system.model.Attendance;
 import com.attendance_system.model.User;
 import com.attendance_system.role.Role;
@@ -12,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
@@ -79,4 +81,37 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 
 //    List<Attendance> findByDateAndUserRoleOrderByPosition(LocalDate date, Role role);
 //    List<Attendance> findByDateOrderByUserRoleAscPositionAsc(LocalDate date);
+
+    @Query("SELECT SUM(a.point) FROM Attendance a WHERE a.user.id = :userId")
+    Integer getTotalPointsByUserId(@Param("userId") Long userId);
+
+    @Query(value =
+            "SELECT u.id as user_id, u.first_name as first_name, u.last_name as last_name, " +
+                    "COALESCE(SUM(a.point), 0) as total_points, " +
+                    "RANK() OVER (ORDER BY COALESCE(SUM(a.point), 0) DESC) as position " +
+                    "FROM nsp u " +
+                    "LEFT JOIN attendance a ON u.id = a.user_id " +
+                    "WHERE u.role = 'NSP' " +  // Filter only users with NSP role
+                    "GROUP BY u.id, u.first_name, u.last_name " +
+                    "ORDER BY total_points DESC",
+            nativeQuery = true)
+    List<Map<String, Object>> findAllNspUsersWithTotalPointsAndRank();
+
+
+        @Query(value = """
+        SELECT COUNT(DISTINCT a.date)
+        FROM attendance a
+        WHERE a.user_id = :userId
+          AND EXTRACT(MONTH FROM a.date) = :month
+          AND EXTRACT(YEAR FROM a.date) = :year
+          AND EXTRACT(DOW FROM a.date) BETWEEN 1 AND 5
+        """, nativeQuery = true)
+        int countWeekdayAttendancesByUserAndMonth(
+                @Param("userId") Long userId,
+                @Param("month") int month,
+                @Param("year") int year
+        );
+
+    boolean existsByUserIdAndDateAndCheckInTimeIsNotNull(Long userId, LocalDate date);
+
 }

@@ -2,6 +2,7 @@ package com.attendance_system.controller;
 
 import com.attendance_system.dto.AttendanceDTO;
 import com.attendance_system.dto.UserDTO;
+import com.attendance_system.dto.UserPointsDTO;
 import com.attendance_system.exceptions.AttendanceServiceException;
 import com.attendance_system.exceptions.UnauthorizedUserException;
 import com.attendance_system.exceptions.UserNotFoundException;
@@ -225,6 +226,21 @@ public class AdminController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @GetMapping("/points/leaderboard")
+    public ResponseEntity<List<UserPointsDTO>> getUsersPointsLeaderboard() {
+
+        try{
+            List<UserPointsDTO> leaderboard = attendanceService.getUsersLeaderboard();
+            if (leaderboard.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(leaderboard);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
 

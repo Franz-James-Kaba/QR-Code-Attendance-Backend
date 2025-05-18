@@ -13,4 +13,5 @@ public class UserResponse {
     private String middleName;
     private String lastName;
     private Role role;
+    private boolean checkedIn;
 }
