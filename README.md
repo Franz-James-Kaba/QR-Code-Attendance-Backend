@@ -901,18 +901,18 @@ GET /average-check-in-time-nsp
 
 #### Request Parameters
 
-| Parameter | Type | Required | Format | Description |
-|-----------|------|----------|--------|-------------|
-| startDate | Date | Yes | ISO Date (YYYY-MM-DD) | The start date of the date range |
-| endDate | Date | Yes | ISO Date (YYYY-MM-DD) | The end date of the date range |
+| Parameter | Type | Required | Format                | Description                      |
+|-----------|------|----------|-----------------------|----------------------------------|
+| startDate | Date | Yes      | ISO Date (YYYY-MM-DD) | The start date of the date range |
+| endDate   | Date | Yes      | ISO Date (YYYY-MM-DD) | The end date of the date range   |
 
 #### Responses
 
-| Status Code | Description | Response Type |
-|-------------|-------------|---------------|
-| 200 | Success | LocalTime (ISO Time format) |
-| 204 | No Content (No data available for the specified date range) | Empty |
-| 400 | Bad Request (Invalid parameters) | Error message |
+| Status Code | Description                                                 | Response Type               |
+|-------------|-------------------------------------------------------------|-----------------------------|
+| 200         | Success                                                     | LocalTime (ISO Time format) |
+| 204         | No Content (No data available for the specified date range) | Empty                       |
+| 400         | Bad Request (Invalid parameters)                            | Error message               |
 
 #### Example Request
 
@@ -936,18 +936,18 @@ GET /average-check-out-time-nsp
 
 #### Request Parameters
 
-| Parameter | Type | Required | Format | Description |
-|-----------|------|----------|--------|-------------|
-| startDate | Date | Yes | ISO Date (YYYY-MM-DD) | The start date of the date range |
-| endDate | Date | Yes | ISO Date (YYYY-MM-DD) | The end date of the date range |
+| Parameter | Type | Required | Format                | Description                      |
+|-----------|------|----------|-----------------------|----------------------------------|
+| startDate | Date | Yes      | ISO Date (YYYY-MM-DD) | The start date of the date range |
+| endDate   | Date | Yes      | ISO Date (YYYY-MM-DD) | The end date of the date range   |
 
 #### Responses
 
-| Status Code | Description | Response Type |
-|-------------|-------------|---------------|
-| 200 | Success | LocalTime (ISO Time format) |
-| 204 | No Content (No data available for the specified date range) | Empty |
-| 400 | Bad Request (Invalid parameters) | Error message |
+| Status Code | Description                                                 | Response Type               |
+|-------------|-------------------------------------------------------------|-----------------------------|
+| 200         | Success                                                     | LocalTime (ISO Time format) |
+| 204         | No Content (No data available for the specified date range) | Empty                       |
+| 400         | Bad Request (Invalid parameters)                            | Error message               |
 
 #### Example Request
 
@@ -971,18 +971,18 @@ GET /average-check-in-time-facilitator
 
 #### Request Parameters
 
-| Parameter | Type | Required | Format | Description |
-|-----------|------|----------|--------|-------------|
-| startDate | Date | Yes | ISO Date (YYYY-MM-DD) | The start date of the date range |
-| endDate | Date | Yes | ISO Date (YYYY-MM-DD) | The end date of the date range |
+| Parameter | Type | Required | Format                | Description                      |
+|-----------|------|----------|-----------------------|----------------------------------|
+| startDate | Date | Yes      | ISO Date (YYYY-MM-DD) | The start date of the date range |
+| endDate   | Date | Yes      | ISO Date (YYYY-MM-DD) | The end date of the date range   |
 
 #### Responses
 
-| Status Code | Description | Response Type |
-|-------------|-------------|---------------|
-| 200 | Success | LocalTime (ISO Time format) |
-| 204 | No Content (No data available for the specified date range) | Empty |
-| 400 | Bad Request (Invalid parameters) | Error message |
+| Status Code | Description                                                 | Response Type               |
+|-------------|-------------------------------------------------------------|-----------------------------|
+| 200         | Success                                                     | LocalTime (ISO Time format) |
+| 204         | No Content (No data available for the specified date range) | Empty                       |
+| 400         | Bad Request (Invalid parameters)                            | Error message               |
 
 #### Example Request
 
@@ -1030,6 +1030,46 @@ GET /average-check-out-time-facilitator?startDate=2025-04-01&endDate=2025-04-28
 ```
 "16:45:20"
 ```
+
+
+### GET /points/leaderboard
+Retrieves a leaderboard of all users with their respective points and positions sorted by rank.
+Request
+```
+GET /points/leaderboard
+```
+Authorization
+This endpoint may require authentication depending on your system configuration.
+Response
+Success Response (200 OK)
+Returns a list of users with their points and leaderboard positions.
+```json
+[
+    {
+    "firstName": "John",
+    "lastName": "Doe",
+    "totalPoints": 250,
+    "position": 1
+    },
+    {
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "totalPoints": 220,
+    "position": 2
+    },
+    {
+    "firstName": "Robert",
+    "lastName": "Johnson",
+    "totalPoints": 180,
+    "position": 3
+    }
+    ]
+```
+**No Content Response (204 No Content)**
+- Returned when the leaderboard is empty (no users with points).
+- No content
+- Error Response (500 Internal Server Error)
+- Returned when there's a server-side issue processing the request.
 
 ## Error Handling
 
