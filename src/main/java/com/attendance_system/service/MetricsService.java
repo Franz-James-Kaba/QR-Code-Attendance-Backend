@@ -108,7 +108,7 @@ public class MetricsService {
         var email = SecurityContextHolder.getContext().getAuthentication().getName();
         var user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        var checkedIn = attendanceRepository.existsByUserIdAndDateAndCheckInTimeIsNotNull(user.getId(), LocalDate.now());
+        var checkedIn = attendanceRepository.existsByUserIdAndDateAndCheckInTimeIsNotNullAndCheckOutTimeIsNull(user.getId(), LocalDate.now());
 
         return user.getMiddleName().isEmpty() ?
                 UserResponse.builder()
