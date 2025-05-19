@@ -863,7 +863,7 @@ Retrieves the authenticated user's working days in the current month.
     {
       "success": true,
       "message": "Working days retrieved successfully",
-      "workingDays": 12
+      "workingDays": "12/20"
     }
     ```
 
