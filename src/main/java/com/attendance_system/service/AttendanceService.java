@@ -23,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -138,12 +139,28 @@ public class AttendanceService {
         var year = now .getYear();
 
         var workingDays = attendanceRepository.countWeekdayAttendancesByUserAndMonth(user.getId(), month, year);
+        var totalWorkingDays = getTotalWorkingDaysInMonth(year, month);
+
         return WorkingDaysResponse.builder()
                 .success(true)
                 .message("Working days retrieved successfully")
-                .workingDays(workingDays)
+                .workingDays(workingDays + "/" + totalWorkingDays)
                 .build();
     }
+
+    public int getTotalWorkingDaysInMonth(int year, int month) {
+        LocalDate firstDay = LocalDate.of(year, month, 1);
+        LocalDate lastDay = firstDay.withDayOfMonth(firstDay.lengthOfMonth());
+        int workingDays = 0;
+        for (LocalDate date = firstDay; !date.isAfter(lastDay); date = date.plusDays(1)) {
+            DayOfWeek day = date.getDayOfWeek();
+            if (day != DayOfWeek.SATURDAY && day != DayOfWeek.SUNDAY) {
+                workingDays++;
+            }
+        }
+        return workingDays;
+    }
+
 
     private static void logAttendance(String email) {
         log.info("Attendance recorded for user with email address: {}", email);

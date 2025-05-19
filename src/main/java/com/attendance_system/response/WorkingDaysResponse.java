@@ -11,5 +11,5 @@ public class WorkingDaysResponse {
 
     private boolean success;
     private String message;
-    private int workingDays;
+    private String workingDays;
 }
