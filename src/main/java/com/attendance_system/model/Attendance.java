@@ -37,4 +37,12 @@ public class Attendance {
     @Column
     private int point;
 
+    @Column
+    private String sessionCode;
+
+    @Column
+    @Builder.Default
+    private boolean earlyCheckOutAllowed = false;
+
+
 }

@@ -164,6 +164,11 @@ public class AdminController {
         return ResponseEntity.ok(userService.revokeReceptionPrivilege());
     }
 
+    @PostMapping("/allow-early-checkout/{email}")
+    public ResponseEntity<SuccessResponse> earlyCheckOut(@PathVariable("email") String email) {
+        return ResponseEntity.ok(attendanceService.earlyCheckOut(email));
+    }
+
     //average check in time for nsps
     @GetMapping("/average-check-in-time-nsp")
     public ResponseEntity<?> getAverageCheckInTimeForNSPS(

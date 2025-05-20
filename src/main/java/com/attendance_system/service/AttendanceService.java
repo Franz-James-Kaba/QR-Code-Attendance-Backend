@@ -36,10 +36,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class AttendanceService {
+    private static final LocalTime DEFAULT_EARLY_TIME = LocalTime.of(7, 30);
     private final AttendanceRepository attendanceRepository;
     private final SessionRepository sessionRepository;
     private final UserRepository userRepository;
-    private static final LocalTime DEFAULT_EARLY_TIME = LocalTime.of(7, 30);
+
+    private static void logAttendance(String email) {
+        log.info("Attendance recorded for user with email address: {}", email);
+    }
 
     public SuccessResponse checkIn(String sessionCode) {
         validateSession(sessionCode);
@@ -66,6 +70,7 @@ public class AttendanceService {
                 .date(LocalDate.now())
                 .position(position)
                 .point(points)
+                .sessionCode(sessionCode)
                 .build();
         attendanceRepository.save(attendance);
         logAttendance(user.getEmail());
@@ -105,7 +110,7 @@ public class AttendanceService {
         LocalTime minCheckOutTime = LocalTime.of(16, 30);
         LocalDateTime minCheckOutDateTime = LocalDateTime.of(today, minCheckOutTime);
 
-        if (LocalDateTime.now().isBefore(minCheckOutDateTime))
+        if (LocalDateTime.now().isBefore(minCheckOutDateTime) && !attendance.isEarlyCheckOutAllowed())
             throw new IllegalStateException("Cannot check out before 4:30 PM");
 
 
@@ -116,6 +121,20 @@ public class AttendanceService {
         return SuccessResponse.builder()
                 .message("Checked out successfully")
                 .success(true)
+                .build();
+    }
+
+    public SuccessResponse earlyCheckOut(String email) {
+        var user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        var attendance = attendanceRepository.findByUserAndDate(user, LocalDate.now())
+                .orElseThrow(() -> new ResourceNotFoundException("Attendance not found"));
+
+        attendance.setEarlyCheckOutAllowed(true);
+        attendanceRepository.save(attendance);
+        return SuccessResponse.builder()
+                .success(true)
+                .message("Early checkout has been approved. User can now check out before the scheduled time.")
                 .build();
     }
 
@@ -159,11 +178,6 @@ public class AttendanceService {
             }
         }
         return workingDays;
-    }
-
-
-    private static void logAttendance(String email) {
-        log.info("Attendance recorded for user with email address: {}", email);
     }
 
     private void validateSession(String sessionCode) {
@@ -259,4 +273,6 @@ public class AttendanceService {
                 attendance.getCheckInTime()
         );
     }
+
+
 }
