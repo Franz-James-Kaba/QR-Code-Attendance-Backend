@@ -112,6 +112,5 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
                 @Param("year") int year
         );
 
-    boolean existsByUserIdAndDateAndCheckInTimeIsNotNull(Long userId, LocalDate date);
-
+    boolean existsByUserIdAndDateAndCheckInTimeIsNotNullAndCheckOutTimeIsNull(Long id, LocalDate date);
 }
