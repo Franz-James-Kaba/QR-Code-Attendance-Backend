@@ -1,7 +1,7 @@
 package com.attendance_system.repository;
 
-import com.attendance_system.dto.UserPointsDTO;
 import com.attendance_system.model.Attendance;
+import com.attendance_system.model.Session;
 import com.attendance_system.model.User;
 import com.attendance_system.role.Role;
 import org.springframework.data.domain.Page;
@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@Repository
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     @Query("SELECT a FROM Attendance a WHERE a.date = :date")
     Page<Attendance> findAttendeesByDate(
@@ -98,19 +100,21 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     List<Map<String, Object>> findAllNspUsersWithTotalPointsAndRank();
 
 
-        @Query(value = """
-        SELECT COUNT(DISTINCT a.date)
-        FROM attendance a
-        WHERE a.user_id = :userId
-          AND EXTRACT(MONTH FROM a.date) = :month
-          AND EXTRACT(YEAR FROM a.date) = :year
-          AND EXTRACT(DOW FROM a.date) BETWEEN 1 AND 5
-        """, nativeQuery = true)
-        int countWeekdayAttendancesByUserAndMonth(
-                @Param("userId") Long userId,
-                @Param("month") int month,
-                @Param("year") int year
-        );
+    @Query(value = """
+    SELECT COUNT(DISTINCT a.date)
+    FROM attendance a
+    WHERE a.user_id = :userId
+      AND EXTRACT(MONTH FROM a.date) = :month
+      AND EXTRACT(YEAR FROM a.date) = :year
+      AND EXTRACT(DOW FROM a.date) BETWEEN 1 AND 5
+    """, nativeQuery = true)
+    int countWeekdayAttendancesByUserAndMonth(
+            @Param("userId") Long userId,
+            @Param("month") int month,
+            @Param("year") int year
+    );
+
+    List<Attendance> findBySession(Session session);
 
     boolean existsByUserIdAndDateAndCheckInTimeIsNotNullAndCheckOutTimeIsNull(Long id, LocalDate date);
 }

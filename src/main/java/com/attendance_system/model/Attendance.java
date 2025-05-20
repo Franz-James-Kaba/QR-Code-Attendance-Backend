@@ -37,4 +37,13 @@ public class Attendance {
     @Column
     private int point;
 
+    @OneToOne
+    @JoinColumn(name = "session_id")
+    private Session session;
+
+    @Column
+    @Builder.Default
+    private boolean earlyCheckOutAllowed = false;
+
+
 }
