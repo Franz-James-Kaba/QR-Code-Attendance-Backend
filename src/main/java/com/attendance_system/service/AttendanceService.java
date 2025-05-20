@@ -4,6 +4,7 @@ import com.attendance_system.dto.AttendanceDTO;
 import com.attendance_system.dto.UserPointsDTO;
 import com.attendance_system.exceptions.*;
 import com.attendance_system.model.Attendance;
+import com.attendance_system.model.Session;
 import com.attendance_system.model.User;
 import com.attendance_system.repository.AttendanceRepository;
 import com.attendance_system.repository.SessionRepository;
@@ -46,7 +47,7 @@ public class AttendanceService {
     }
 
     public SuccessResponse checkIn(String sessionCode) {
-        validateSession(sessionCode);
+        var session = validateSession(sessionCode);
 
         var user = getAuthenticatedUser();
         var today = LocalDate.now();
@@ -70,7 +71,7 @@ public class AttendanceService {
                 .date(LocalDate.now())
                 .position(position)
                 .point(points)
-                .sessionCode(sessionCode)
+                .session(session)
                 .build();
         attendanceRepository.save(attendance);
         logAttendance(user.getEmail());
@@ -180,11 +181,12 @@ public class AttendanceService {
         return workingDays;
     }
 
-    private void validateSession(String sessionCode) {
+    private Session validateSession(String sessionCode) {
         var session = sessionRepository.findBySessionCode(sessionCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Session not found"));
         if (!session.isActive())
             throw new InvalidSessionException("Session invalid or expired");
+        return session;
     }
 
     private User getAuthenticatedUser() {
