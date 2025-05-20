@@ -3,6 +3,7 @@ package com.attendance_system.controller;
 import com.attendance_system.model.Session;
 import com.attendance_system.request.GenerateSessionRequest;
 import com.attendance_system.request.UpdateSessionRequest;
+import com.attendance_system.response.AllSessionAttendanceResponse;
 import com.attendance_system.response.SuccessResponse;
 import com.attendance_system.service.SessionService;
 import com.google.zxing.WriterException;
@@ -45,6 +46,11 @@ public class SessionController {
     @GetMapping("{sessionId}")
     public ResponseEntity<Session> getSessionById(@PathVariable("sessionId") Integer sessionId) {
         return ResponseEntity.ok(service.getSessionById(sessionId));
+    }
+
+    @GetMapping("/attendance")
+    public ResponseEntity<AllSessionAttendanceResponse> getAllSessionAttendance(@RequestParam("session-id") Integer id) {
+        return ResponseEntity.ok(service.getAllSessionAttendance(id));
     }
 
     @GetMapping("/inactive")

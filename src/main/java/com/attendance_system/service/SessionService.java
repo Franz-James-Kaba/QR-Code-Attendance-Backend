@@ -2,9 +2,11 @@ package com.attendance_system.service;
 
 import com.attendance_system.exceptions.ResourceNotFoundException;
 import com.attendance_system.model.Session;
+import com.attendance_system.repository.AttendanceRepository;
 import com.attendance_system.repository.SessionRepository;
 import com.attendance_system.request.GenerateSessionRequest;
 import com.attendance_system.request.UpdateSessionRequest;
+import com.attendance_system.response.AllSessionAttendanceResponse;
 import com.attendance_system.response.SuccessResponse;
 import com.google.zxing.WriterException;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,8 @@ public class SessionService {
     private final SessionRepository repository;
     private final QRCodeGenerator qrCodeGenerator;
     private final SessionSchedulerService sessionSchedulerService;
+    private final AttendanceRepository attendanceRepository;
+    private final SessionRepository sessionRepository;
 
     public byte[] generateQRCode(GenerateSessionRequest request, int width, int height) throws IOException, WriterException {
         var sessionCode = UUID.randomUUID().toString();
@@ -77,6 +81,18 @@ public class SessionService {
         return SuccessResponse.builder()
                 .success(true)
                 .message("Session updated successfully")
+                .build();
+    }
+
+    public AllSessionAttendanceResponse getAllSessionAttendance(Integer id) {
+        var session = sessionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Session not found"));
+        var sessionAttendance = attendanceRepository.findBySession(session);
+
+        return AllSessionAttendanceResponse.builder()
+                .success(true)
+                .message("Retrieved all attendance recorded with " + session.getName())
+                .sessionAttendance(sessionAttendance)
                 .build();
     }
 }
