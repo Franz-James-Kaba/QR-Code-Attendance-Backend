@@ -8,10 +8,13 @@ import com.attendance_system.response.WorkingDaysResponse;
 import com.attendance_system.service.AttendanceService;
 import com.attendance_system.response.PositionResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
@@ -38,8 +41,10 @@ public class AttendanceController {
     }
 
     @GetMapping("/position")
-    public ResponseEntity<PositionResponse> getUserPosition() {
-        return ResponseEntity.ok(service.getUserPosition());
+    public ResponseEntity<PositionResponse> getUserPosition(
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    ) {
+        return ResponseEntity.ok(service.getUserPosition(date));
     }
 
     @GetMapping("/points/{userId}")
@@ -57,7 +62,9 @@ public class AttendanceController {
     }
 
     @GetMapping("/working-days")
-    public ResponseEntity<WorkingDaysResponse> getWorkingDays() {
-        return ResponseEntity.ok(service.getWorkingDays());
+    public ResponseEntity<WorkingDaysResponse> getWorkingDays(
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    ) {
+        return ResponseEntity.ok(service.getWorkingDays(date));
     }
 }
