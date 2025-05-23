@@ -82,11 +82,10 @@ public class AttendanceService {
                 .build();
     }
 
-    public PositionResponse getUserPosition() {
+    public PositionResponse getUserPosition(LocalDate date) {
         var user = getAuthenticatedUser();
-        var today = LocalDate.now();
 
-        var attendance = attendanceRepository.findByUserAndDate(user, today)
+        var attendance = attendanceRepository.findByUserAndDate(user, date)
                 .orElseThrow(() -> new ResourceNotFoundException("Attendance not found"));
 
         return PositionResponse.builder()
@@ -152,11 +151,10 @@ public class AttendanceService {
                 .build();
     }
 
-    public WorkingDaysResponse getWorkingDays() {
+    public WorkingDaysResponse getWorkingDays(LocalDate date) {
         var user = getAuthenticatedUser();
-        var now = LocalDate.now();
-        var month = now.getMonthValue();
-        var year = now .getYear();
+        var month = date.getMonthValue();
+        var year = date .getYear();
 
         var workingDays = attendanceRepository.countWeekdayAttendancesByUserAndMonth(user.getId(), month, year);
         var totalWorkingDays = getTotalWorkingDaysInMonth(year, month);

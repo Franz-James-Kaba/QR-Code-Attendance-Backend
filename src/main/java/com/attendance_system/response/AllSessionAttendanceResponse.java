@@ -1,6 +1,6 @@
 package com.attendance_system.response;
 
-import com.attendance_system.model.Attendance;
+import com.attendance_system.dto.CustomAttendance;
 import lombok.*;
 
 import java.util.List;
@@ -13,5 +13,5 @@ import java.util.List;
 public class AllSessionAttendanceResponse {
     private boolean success;
     private String message;
-    private List<Attendance> sessionAttendance;
+    private List<CustomAttendance> sessionAttendance;
 }
