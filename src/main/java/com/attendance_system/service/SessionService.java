@@ -25,6 +25,7 @@ public class SessionService {
     private final SessionSchedulerService sessionSchedulerService;
     private final AttendanceRepository attendanceRepository;
     private final SessionRepository sessionRepository;
+    private final Mapper mapper;
 
     public byte[] generateQRCode(GenerateSessionRequest request, int width, int height) throws IOException, WriterException {
         var sessionCode = UUID.randomUUID().toString();
@@ -87,7 +88,9 @@ public class SessionService {
     public AllSessionAttendanceResponse getAllSessionAttendance(Integer id) {
         var session = sessionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Session not found"));
-        var sessionAttendance = attendanceRepository.findBySession(session);
+        var sessionAttendance = attendanceRepository.findBySession(session).stream()
+                .map(mapper::toAttendanceDTO)
+                .toList();
 
         return AllSessionAttendanceResponse.builder()
                 .success(true)
