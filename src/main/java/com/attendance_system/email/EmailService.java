@@ -3,6 +3,7 @@ package com.attendance_system.email;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,8 @@ public class EmailService {
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine;
     private final EmailConfiguration emailConfiguration;
+    private static final String ENVELOPE_ICON = "envelope-icon";
+    private static final String ENVELOPE_ICON_PATH = "static/images/envelope-icon.png";
 
     public void sendPasswordResetEmail(
             String to,
@@ -49,6 +52,9 @@ public class EmailService {
 
         String template = templateEngine.process(templateName, context);
         helper.setText(template, true);
+
+        ClassPathResource envelopeIcon = new ClassPathResource(ENVELOPE_ICON_PATH);
+        helper.addInline(ENVELOPE_ICON, envelopeIcon);
         mailSender.send(mimeMessage);
     }
 
@@ -66,6 +72,7 @@ public class EmailService {
                 MULTIPART_MODE_MIXED,
                 UTF_8.name()
         );
+
         Map<String, Object> properties = new HashMap<>();
         properties.put("username", username);
         properties.put("email", to);
@@ -80,6 +87,10 @@ public class EmailService {
 
         String template = templateEngine.process(templateName, context);
         helper.setText(template, true);
+
+        ClassPathResource envelopeIcon = new ClassPathResource(ENVELOPE_ICON_PATH);
+        helper.addInline(ENVELOPE_ICON, envelopeIcon);
+
         mailSender.send(mimeMessage);
     }
 
@@ -112,6 +123,9 @@ public class EmailService {
 
         String template = templateEngine.process(templateName, context);
         helper.setText(template, true);
+
+        ClassPathResource envelopeIcon = new ClassPathResource(ENVELOPE_ICON_PATH);
+        helper.addInline(ENVELOPE_ICON, envelopeIcon);
         mailSender.send(mimeMessage);
     }
 }
