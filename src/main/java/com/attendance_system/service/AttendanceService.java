@@ -71,7 +71,7 @@ public class AttendanceService {
                 .date(LocalDate.now())
                 .position(position)
                 .point(points)
-                .session(session)
+                .sessionCode(session.getSessionCode()   )
                 .build();
         attendanceRepository.save(attendance);
         logAttendance(user.getEmail());
