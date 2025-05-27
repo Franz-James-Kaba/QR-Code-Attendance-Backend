@@ -88,7 +88,7 @@ public class SessionService {
     public AllSessionAttendanceResponse getAllSessionAttendance(Integer id) {
         var session = sessionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Session not found"));
-        var sessionAttendance = attendanceRepository.findBySession(session).stream()
+        var sessionAttendance = attendanceRepository.findBySessionCode(session.getSessionCode()).stream()
                 .map(mapper::toAttendanceDTO)
                 .toList();
 

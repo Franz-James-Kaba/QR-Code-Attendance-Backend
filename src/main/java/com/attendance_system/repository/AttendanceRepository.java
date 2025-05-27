@@ -114,7 +114,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
             @Param("year") int year
     );
 
-    List<Attendance> findBySession(Session session);
+    List<Attendance> findBySessionCode(String sessionCode);
 
     boolean existsByUserIdAndDateAndCheckInTimeIsNotNullAndCheckOutTimeIsNull(Long id, LocalDate date);
 }

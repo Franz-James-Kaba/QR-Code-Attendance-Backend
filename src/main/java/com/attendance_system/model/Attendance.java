@@ -37,9 +37,7 @@ public class Attendance {
     @Column
     private int point;
 
-    @OneToOne
-    @JoinColumn(name = "session_id")
-    private Session session;
+    private String sessionCode;
 
     @Column
     @Builder.Default
